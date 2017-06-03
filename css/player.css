@@ -1,0 +1,17 @@
+#players .player {
+  border: 1px solid black;
+  display: inline-block;
+  padding: 10px;
+  border-radius: 10px;
+  opacity: 0.5; }
+  #players .player:last-child {
+    float: right; }
+  #players .player.active {
+    opacity: 1; }
+  #players .player .name {
+    display: block;
+    background: #FFC107;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 5px; }

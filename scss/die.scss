@@ -1,0 +1,70 @@
+@import "functions";
+
+
+@function cross-faced($fill-color, $dots-color){
+    
+    @return "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='110' width='110'>
+                    <style>.s0{fill:red;stroke-width:8;stroke:#{$dots-color};opacity:0.25}</style>
+                    <rect x='5' y='5' width='100' height='100' ry='30' rx='30' style='fill:#{$fill-color};stroke-width:3;stroke:#000;opacity:0.25'/>
+                    <line x1='15' y1='15' x2='95' y2='95' class='s0'/>
+                    <line x1='95' y1='15' x2='15' y2='95' class='s0'/>
+            </svg>"
+}
+
+@function number-faced($number, $fill-color, $dots-color){
+    
+    $start: "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='110' width='110'>
+                <style>.s0{fill:#{$dots-color};stroke-width:3;stroke:black;}</style>
+                <rect x='5' y='5' width='100' height='100' ry='30' rx='30' style='fill:#{$fill-color};stroke-width:3;stroke:#000'/>";
+    
+    $finish: "</svg>";
+    
+    $dots: "";
+    
+    @if $number > 1{
+        $dots: $dots + "<circle cx='30' cy='25' r='8' class='s0'/><circle cx='80' cy='85' r='8' class='s0'/>";
+    }
+    @if $number == 6{
+        $dots: $dots + "<circle cx='30' cy='55' r='8' class='s0'/><circle cx='80' cy='55' r='8' class='s0'/>";
+    }
+    @if $number >= 4{
+        $dots: $dots + "<circle cx='30' cy='85' r='8' class='s0'/><circle cx='80' cy='25' r='8' class='s0'/>";
+    }
+    @if $number == 1 or $number == 3 or $number == 5{
+        $dots: $dots + "<circle cx='55' cy='55' r='8' class='s0'/>";
+    }
+    
+    @return $start + $dots + $finish; 
+}
+
+.die{
+    display: inline-block;
+    min-height: 1em;
+    padding-left: 1em;
+    background-size: 1em;
+    background-repeat: no-repeat;
+    float: left;
+    
+    @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "white", "black"));}}
+    &.die-cross{@include background-svg(cross-faced("white", "black"));}
+    
+    &.black{
+        @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "black", "white"));}}
+        &.die-cross{@include background-svg(cross-faced("black", "white"));}
+    }
+    
+    &.red{
+        @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#f42a2a", "black"));}}
+        &.die-cross{@include background-svg(cross-faced("#f42a2a", "black"));}
+    }
+    
+    &.green{
+        @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#44bf12", "black"));}}
+        &.die-cross{@include background-svg(cross-faced("#44bf12", "black"));}
+    }
+    
+    &.blue{
+        @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#2459ea", "white"));}}
+        &.die-cross{@include background-svg(cross-faced("#2459ea", "white"));}
+    }
+}

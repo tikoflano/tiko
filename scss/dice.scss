@@ -1,0 +1,12 @@
+#dice{
+    font-size: 2em;
+    
+    .die{
+        opacity: 0.25;
+        cursor: pointer;
+        
+        &.active{
+            opacity: 1;
+        }
+    }
+}
