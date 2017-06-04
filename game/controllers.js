@@ -5,9 +5,9 @@ app.controller("GameController", function(Player, Deck, Board) {
     self.board = new Board(5, 5);
     
     self.dice = [
-        {color: "black", selected: false},
-        {color: "green", selected: false},
-        {color: "blue", selected: false}
+        {color: "black", selected: false, number: null},
+        {color: "green", selected: false, number: null},
+        {color: "blue", selected: false, number: null}
     ];
     
     self.players = [];
@@ -48,19 +48,29 @@ app.controller("GameController", function(Player, Deck, Board) {
             return false;
         }
         
-        var response = self.board.playCard(selected_card[0]);
-        if(response){
+        self.board.playCard(selected_card[0])
+        .then(function(){
             self.active_player.removeCard(selected_card[0]).refillHand(self.deck);
             self.activeNextPlayer();
+            self.throwDice();
             self.deactivateDice();
-        }
+        })
+        .catch(function(error){
+            console.log(error);
+        });
         
     };
     
+    self.throwDice = function(){
+        _.forEach(_.filter(self.dice, "active"), function(die){
+            die.number = _.random(1, 6);
+        });
+    };
+    
     self.deactivateDice = function(){
-        for(var i = 0, len = self.dice.length; i < len; i++){
-            self.dice[i].active = false;
-        }
+        _.forEach(self.dice, function(die){
+            die.active = false;
+        });
     };
     
     self.init = function(){

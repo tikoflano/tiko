@@ -2,10 +2,11 @@
 <html>
     <head>
         <base href="/tiko/" />
-        <title>TIKO</title>
+        <title>Juego</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
+        <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/card.css"/>
         <link rel="stylesheet" type="text/css" href="css/die.css"/>
@@ -13,6 +14,8 @@
         <link rel="stylesheet" type="text/css" href="css/board.css"/>
         <link rel="stylesheet" type="text/css" href="css/player.css"/>
         
+        <script src="jquery/jquery-3.2.1.min.js"></script>
+        <script src="semantic/semantic.min.js"></script>
         <script src="angular-1.6.4/angular.min.js"></script>
         <script src="angular-1.6.4/angular-messages.min.js"></script>
         <script src="lodash/lodash.min.js"></script>
@@ -20,47 +23,54 @@
         <script src="game/game.js"></script>
         <script src="game/controllers.js"></script>
         <script src="game/factories.js"></script>
+        <script src="game/factories/board.js"></script>
         <script src="game/directives.js"></script>
     </head>
     <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()">
-        
-        <input type="text" ng-model="new_player_name"/>
-        <button ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''">Agregar</button>
-        <button ng-click="ctrl.playTurn()">Jugar turno</button>
-        
-        <hr class="clear">
-        
-        <div id="players">
-            <div ng-repeat="player in ctrl.players" class="player" ng-class="{active: player.active}">
-                <span class="name" ng-style="{background: player.color}">{{player.name}}</span>
-                <div class="hand">
-                    <span ng-repeat="number_card in player.hand">
-                        <number-card number-card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></number-card>
-                    </span>
+        <div class="ui container">
+            <div class="ui celled grid">
+                <div id="actions" class="row">
+                    <div class="column">
+                        <input type="text" ng-model="new_player_name"/>
+                        <button ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''">Agregar</button>
+                        <button ng-click="ctrl.playTurn()">Jugar turno</button>
+                    </div>
+                </div>
+                <div id="players" class="equal width row">
+                    <div class="center aligned column" ng-repeat="player in ctrl.players" >
+                        <div class="ui compact segment player" ng-class="{active: player.active}">
+                            <span class="name" ng-style="{background: player.color}">{{player.name}}</span>
+                            <div class="hand">
+                                <span ng-repeat="number_card in player.hand">
+                                    <number-card number-card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></number-card>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="dice" class="centered row">
+                    <div class="ui horizontal segments">
+                        <span class="ui die compact segment" ng-repeat="die in ctrl.dice" ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" ng-click="die.active = !die.active"></span>
+                    </div>
+                </div>
+                <div class="centered row">
+                    <div id="board">
+                        <div ng-repeat="row in ctrl.board.rows">
+                            <span ng-repeat="number_card in row">
+                                <number-card ng-click="number_card.active = !number_card.active" number-card="number_card"></number-card>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <hr class="clear">
-        
-        <div id="dice">
-            <span class="die die-0" ng-repeat="die in ctrl.dice" ng-class="[die.color, {active: die.active}]" ng-click="die.active = !die.active"></span>
-        </div>
-        
-        <hr class="clear">
-        
-        <div id="board">
-            <div ng-repeat="row in ctrl.board.rows">
-                <span ng-repeat="number_card in row">
-                    <number-card ng-click="number_card.active = !number_card.active" number-card="number_card"></number-card>
-                </span>
+
+            
+
+            <hr class="clear">
+
+            <div ng-repeat="number_card in ctrl.deck.cards">
+                <number-card number-card="number_card"></number-card>
             </div>
-        </div>
-        
-        <hr class="clear">
-        
-        <div ng-repeat="number_card in ctrl.deck.cards">
-            <number-card number-card="number_card"></number-card>
         </div>
     </body>
 </html>

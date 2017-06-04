@@ -4,8 +4,6 @@
   padding: 10px;
   border-radius: 10px;
   opacity: 0.5; }
-  #players .player:last-child {
-    float: right; }
   #players .player.active {
     opacity: 1; }
   #players .player .name {

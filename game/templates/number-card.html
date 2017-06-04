@@ -1,6 +1,15 @@
-<div class="number card" ng-class="{'active' : numberCard.active}">
-    <span class="black die" ng-class="numberCard.numbers.black ? 'die-'+numberCard.numbers.black : 'die-cross'"></span>
-    <span class="green die" ng-class="numberCard.numbers.green ? 'die-'+numberCard.numbers.green : 'die-cross'"></span>
-    <span class="blue die" ng-class="numberCard.numbers.blue ? 'die-'+numberCard.numbers.blue : 'die-cross'"></span>
-    <span class="white die" ng-class="numberCard.numbers.white ? 'die-'+numberCard.numbers.white : 'die-cross'"></span>
+<div class="ui compact segments" ng-class="{'active' : numberCard.active}">
+    <div class="ui horizontal compact segments">
+        <div class="ui black die compact segment" ng-class="numberCard.numbers.black ? 'die-'+numberCard.numbers.black : 'die-cross'"></div>
+        <div class="ui green die compact segment" ng-class="numberCard.numbers.green ? 'die-'+numberCard.numbers.green : 'die-cross'"></div>
+    </div>
+    <div class="ui horizontal compact segments">
+        <div class="ui blue die compact segment" ng-class="numberCard.numbers.blue ? 'die-'+numberCard.numbers.blue : 'die-cross'"></div>
+        <div class="ui white die compact segment"ng-class="numberCard.numbers.white ? 'die-'+numberCard.numbers.white : 'die-cross'"></div>
+    </div>
 </div>
+
+
+    
+    
+    
