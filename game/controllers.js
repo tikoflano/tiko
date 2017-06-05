@@ -15,12 +15,12 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     
     self.active_player = {};
     
-    self.addPlayer = function(name, color){
+    self.addPlayer = function(name){
         if(self.players.length >= 2){
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, self.players.length ? "blue" : "red");
+        var player = new Player(name, self.players.length ? "#cddc39" : "red");
         player.refillHand(self.deck);
         self.players.push(player);
         
@@ -99,8 +99,8 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     };
     
     self.init = function(){
-        self.addPlayer("a", "red");
-        self.addPlayer("b", "blue");
+        self.addPlayer("a");
+        self.addPlayer("b");
     };
     
     self.activeNextPlayer = function(){

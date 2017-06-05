@@ -1,4 +1,17 @@
-app.factory("NumberCard", function(){
+app.factory("Card", function(){
+    var self = this;
+    
+    var Card = function(){
+        this.type = null;
+        this.active = false;
+    };
+    
+    Card.prototype.isEmpty = function(){return false;};
+    
+    return Card;
+});
+
+app.factory("NumberCard", function(Card){
     var self = this;
     
     var NumberCard = function(a, b, c){
@@ -9,8 +22,9 @@ app.factory("NumberCard", function(){
             blue: c,
             white: null
         };
-        this.active = false;
     };
+    NumberCard.prototype = new Card();
+    NumberCard.prototype.constructor = NumberCard;
     
     NumberCard.prototype.isEmpty = function(){
         return _.filter(this.numbers, function(number) { return number; }).length === 0;
@@ -19,14 +33,15 @@ app.factory("NumberCard", function(){
     return NumberCard;
 });
 
-app.factory("PlayerCard", function(){
+app.factory("PlayerCard", function(Card){
     var self = this;
     
     var PlayerCard = function(player){
         this.type = "player";
         this.player = player;
-        this.active = false;
     };
+    PlayerCard.prototype = new Card();
+    PlayerCard.prototype.constructor = PlayerCard;
     
     return PlayerCard;
 });

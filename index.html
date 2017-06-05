@@ -34,9 +34,10 @@
             <div class="ui celled grid">
                 <div id="actions" class="row">
                     <div class="column">
+                        <input type="color" ng-model="new_player_color" ng-disabled="ctrl.players.length >= 2">
                         <div class="ui action input">
-                            <input type="text" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
-                            <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
+                            <input type="text" ng-model="new_player_name" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
+                            <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
                         </div>
                         <button class="ui labeled right floated icon blue button" ng-click="ctrl.playTurn()">
                             <i class="play icon"></i>Jugar turno

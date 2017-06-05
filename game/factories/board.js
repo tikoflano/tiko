@@ -22,6 +22,7 @@ app.factory("Board", ["NumberCard", "$q", function(NumberCard, $q){
     
     Board.prototype.playCard = function(card){
         var selected_position;
+        var empty = this.isEmpty();
         
         for(var i = 0, len = this.rows.length; i < len; i++){
             for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
@@ -29,17 +30,33 @@ app.factory("Board", ["NumberCard", "$q", function(NumberCard, $q){
                     if(selected_position){
                         return $q.reject("Select just one position in the board");
                     }
-                    selected_position = this.rows[i][j];
+                    selected_position = {row: i, column: j};
                 }
             } 
         }
+        
         
         if(!selected_position){
             return $q.reject("Select one position in the board");
         }
         
-        angular.copy(card, selected_position);
-        selected_position.active = false;
+        if(empty && (selected_position.row != (this.rows.length - 1) / 2 || selected_position.column != (this.rows[0].length - 1) / 2)){
+            return $q.reject("The first card must be placed in the center");
+        }
+        
+        if(!empty && (
+                (selected_position.row <= 0 || this.rows[selected_position.row - 1][selected_position.column].isEmpty()) &&
+                (selected_position.column + 1 >= this.rows[selected_position.row].length || this.rows[selected_position.row][selected_position.column + 1].isEmpty()) &&
+                (selected_position.row + 1 >= this.rows.length || this.rows[selected_position.row + 1][selected_position.column].isEmpty()) &&
+                (selected_position.column <= 0 || this.rows[selected_position.row][selected_position.column - 1].isEmpty())
+            )){
+            return $q.reject("Select one position next to a number card in the board");
+        }
+        
+        
+        
+        angular.copy(card, this.rows[selected_position.row][selected_position.column]);
+        this.rows[selected_position.row][selected_position.column].active = false;
         return $q.resolve();
     };
     
