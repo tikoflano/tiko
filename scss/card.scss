@@ -1,19 +1,32 @@
-number-card {
-    .ui.segments{
-        font-size: 1.5em;
-        background: #9E9E9E;
-        border: 2px solid #3c3c3c;
+card {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    
+    & > div{
+        width: 64px;
+        height: 64px;
+        border: 1px solid #3c3c3c;
         padding: 2px;
         border-radius: 5px;
         cursor: pointer;
-
+        background: #9E9E9E;
         &.active{
-            border-color: rgba(255, 255, 0, 0.83);
             background: rgba(255, 255, 0, 0.83);
+            border-color: rgba(255, 255, 0, 0.83);
         }
+    }
+    
+    .number.ui.segments{
+        border: none;
         
         & > .ui.segments{
             border: none;
         }
+    }
+    
+    .player.ui.segment{
+        height: 100%;
+        margin: 0px;
     }
 }

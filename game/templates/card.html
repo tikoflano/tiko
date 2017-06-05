@@ -1,0 +1,18 @@
+<div ng-class="[card.type, {'active' : card.active}]">
+    <div class="ui number compact segments" ng-if="card.type == 'number'">
+        <div class="ui horizontal compact segments">
+            <div class="ui black die compact segment" ng-class="card.numbers.black ? 'die-'+card.numbers.black : ''"></div>
+            <div class="ui green die compact segment" ng-class="card.numbers.green ? 'die-'+card.numbers.green : ''"></div>
+        </div>
+        <div class="ui horizontal compact segments">
+            <div class="ui blue die compact segment" ng-class="card.numbers.blue ? 'die-'+card.numbers.blue : ''"></div>
+            <div class="ui white die compact segment"ng-class="card.numbers.white ? 'die-'+card.numbers.white : ''"></div>
+        </div>
+    </div>
+    <div class="ui player segment" ng-if="card.type == 'player'" ng-class="{'active' : card.active}" ng-style="{'background-color': card.player.color}"></div>
+</div>
+
+
+    
+    
+    

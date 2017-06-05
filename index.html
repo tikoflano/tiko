@@ -23,8 +23,10 @@
         
         <script src="game/game.js"></script>
         <script src="game/controllers.js"></script>
-        <script src="game/factories.js"></script>
+        <script src="game/factories/card.js"></script>
         <script src="game/factories/board.js"></script>
+        <script src="game/factories/player.js"></script>
+        <script src="game/factories/deck.js"></script>
         <script src="game/directives.js"></script>
     </head>
     <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()">
@@ -53,10 +55,10 @@
                 <div id="players" class="equal width row">
                     <div class="center aligned column" ng-repeat="player in ctrl.players" >
                         <div class="ui compact segment player" ng-class="{active: player.active}">
-                            <span class="name" ng-style="{background: player.color}">{{player.name}}</span>
+                            <span class="name" ng-style="{background: player.color}">{{player.name}} {{player.player_cards.length}}</span>
                             <div class="hand">
                                 <span ng-repeat="number_card in player.hand">
-                                    <number-card number-card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></number-card>
+                                    <card card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></card>
                                 </span>
                             </div>
                         </div>
@@ -69,19 +71,23 @@
                 </div>
                 <div class="centered row">
                     <div id="board">
-                        <div ng-repeat="row in ctrl.board.rows">
-                            <number-card ng-repeat="number_card in row" ng-click="number_card.active = !number_card.active" number-card="number_card"></number-card>
+                        <div class="ui compact segments">
+                            <div class="ui horizontal segments" ng-repeat="row in ctrl.board.rows">
+                                <div class="ui segment" ng-repeat="number_card in row" >
+                                    <card ng-click="number_card.active = !number_card.active" card="number_card"></card>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            
+            <card card="ctrl.players[0].player_cards[0]"></card>
 
             <hr class="clear">
 
             <div ng-repeat="number_card in ctrl.deck.cards">
-                <number-card number-card="number_card"></number-card>
+                <card card="number_card"></card>
             </div>
         </div>
     </body>

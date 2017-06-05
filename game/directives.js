@@ -1,9 +1,9 @@
-app.directive("numberCard", function () {
+app.directive("card", function () {
     return {
         restrict: "E",
         scope:{
-            numberCard: "="
+            card: "="
         },
-        templateUrl: "game/templates/number-card.html"
+        templateUrl: "game/templates/card.html"
     };
 });

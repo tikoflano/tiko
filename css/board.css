@@ -1,4 +1,5 @@
 #board {
   margin: 10px 0px; }
-  #board > div {
-    margin-bottom: 2px; }
+  #board > .ui.segments > .ui.segments > .ui.segment {
+    height: 64px;
+    padding: 0px; }

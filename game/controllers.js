@@ -53,12 +53,27 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         self.board.playCard(selected_card[0])
         .then(function(){
             self.active_player.removeCard(selected_card[0]).refillHand(self.deck);
-            self.activeNextPlayer();
+            
             self.throwDice();
+            
+            //Check cards number
+            for(var i = 0, len = self.board.rows.length; i < len; i++){
+                for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                    if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
+                        _.forEach(_.filter(self.dice, "active"), function(die){
+                            if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
+                                self.board.rows[i][j] = self.active_player.player_cards.pop();
+                                return false;
+                            }
+                        });
+                    }
+                } 
+            }
+            
             self.deactivateDice();
             self.resetDice();
-        })
-        .catch(function(error){
+            self.activeNextPlayer();
+        }, function(error){
             self.message = {type: "error", header: "Error", message: error};
         });
         
@@ -67,6 +82,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     self.throwDice = function(){
         _.forEach(_.filter(self.dice, "active"), function(die){
             die.number = _.random(1, 6);
+            console.log(die.color, die.number);
         });
     };
     
