@@ -35,7 +35,6 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
             } 
         }
         
-        
         if(!selected_position){
             return $q.reject("Select one position in the board");
         }
@@ -53,9 +52,7 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
             return $q.reject("Select one position next to a number card in the board");
         }
         
-        
-        
-        angular.copy(card, this.rows[selected_position.row][selected_position.column]);
+        this.rows[selected_position.row][selected_position.column] = card;
         this.rows[selected_position.row][selected_position.column].active = false;
         return $q.resolve();
     };

@@ -40,10 +40,6 @@ app.factory("NumberCard", function(Card){
     NumberCard.prototype = new Card();
     NumberCard.prototype.constructor = NumberCard;
     
-    NumberCard.prototype.isEmpty = function(){
-        return _.filter(this.numbers, function(number) { return number; }).length === 0;
-    };
-    
     return NumberCard;
 });
 
