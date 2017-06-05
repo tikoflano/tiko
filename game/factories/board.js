@@ -43,7 +43,10 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
             return $q.reject("Select an empty position in the board");
         }
         
-        if(empty && (selected_position.row != (this.rows.length - 1) / 2 || selected_position.column != (this.rows[0].length - 1) / 2)){
+        if(empty && (
+                ((selected_position.row != Math.floor((this.rows.length - 1) / 2)) && (selected_position.row != Math.ceil((this.rows.length - 1) / 2))) ||
+                ((selected_position.column != Math.floor((this.rows[0].length - 1) / 2)) && (selected_position.column != Math.ceil((this.rows[0].length - 1) / 2)))
+            )){
             return $q.reject("The first card must be placed in the center");
         }
         
