@@ -43,5 +43,17 @@ app.factory("Board", ["NumberCard", "$q", function(NumberCard, $q){
         return $q.resolve();
     };
     
+    Board.prototype.isEmpty = function(){
+        for(var i = 0, len = this.rows.length; i < len; i++){
+            for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
+                if(!this.rows[i][j].isEmpty()){
+                    return false;
+                }
+            } 
+        }
+        
+        return true;
+    };
+    
     return Board;
 }]);

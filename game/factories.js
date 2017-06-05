@@ -39,8 +39,7 @@ app.factory("NumberCard", function(){
     };
     
     NumberCard.prototype.isEmpty = function(){
-        console.log(_.filter(this.numbers, function(o) { return o; }).length === 0)
-        return _.filter(this.numbers, function(o) { return o; }).length === 0;
+        return _.filter(this.numbers, function(number) { return number; }).length === 0;
     };
     
     return NumberCard;
