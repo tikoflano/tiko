@@ -1,4 +1,4 @@
-app.factory("Board", ["NumberCard", "$q", function(NumberCard, $q){
+app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
     var self = this;
     
     var Board = function(width, height){
@@ -14,7 +14,7 @@ app.factory("Board", ["NumberCard", "$q", function(NumberCard, $q){
     Board.prototype.reset = function(){
         for(var i = 0, len = this.rows.length; i < len; i++){
             for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
-                this.rows[i][j] = new NumberCard();
+                this.rows[i][j] = new EmptyCard();
             } 
         }
         angular.copy(_.shuffle(this.cards), this.cards);

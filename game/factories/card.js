@@ -11,6 +11,20 @@ app.factory("Card", function(){
     return Card;
 });
 
+app.factory("EmptyCard", function(Card){
+    var self = this;
+    
+    var EmptyCard = function(){
+        this.type = "empty";
+    };
+    EmptyCard.prototype = new Card();
+    EmptyCard.prototype.constructor = EmptyCard;
+    
+    EmptyCard.prototype.isEmpty = function(){return true;};
+    
+    return EmptyCard;
+});
+
 app.factory("NumberCard", function(Card){
     var self = this;
     
