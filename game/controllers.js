@@ -17,7 +17,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     
     self.addPlayer = function(name, color){
         if(self.players.length >= 2){
-            console.log("Can't add more players");
+            self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
         var player = new Player(name, self.players.length ? "blue" : "red");
