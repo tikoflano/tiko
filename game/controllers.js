@@ -1,5 +1,11 @@
 app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(Player, Deck, Board, $scope) {
     var self = this;
+    
+    self.phase = 0;
+    self.phases = [
+        {text: "Jugar carta", fn: playCard},
+        {text: "Seleccionar figura", fn: selectFigure}
+    ];
    
     self.deck = new Deck();
     self.board = new Board(5, 5);
@@ -20,7 +26,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, self.players.length ? "#cddc39" : "red");
+        var player = new Player(name, self.players.length ? "#03A9F4" : "red");
         player.refillHand(self.deck);
         self.players.push(player);
         
@@ -29,7 +35,8 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         }
     };
     
-    self.playTurn = function(){
+    //Phases functions
+    function playCard(){
         self.message = false;
         
         var selected_card = _.filter(self.active_player.hand, "active");
@@ -57,12 +64,14 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
             self.throwDice();
             
             //Check cards number
+            var number_hitted = false;
             for(var i = 0, len = self.board.rows.length; i < len; i++){
                 for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
                     if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
                         _.forEach(_.filter(self.dice, "active"), function(die){
                             if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
                                 self.board.rows[i][j] = self.active_player.player_cards.pop();
+                                number_hitted = true;
                                 return false;
                             }
                         });
@@ -70,13 +79,57 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
                 } 
             }
             
-            self.deactivateDice();
-            self.resetDice();
-            self.activeNextPlayer();
+            //Check groups of 4+ if any card number was hitted
+            if(number_hitted){
+                var chain = self.getChain();
+                if(!chain){
+                    self.endTurn();
+                }
+                else{
+                    self.phase = 1;
+                }
+            }
+            else{
+                self.endTurn();
+            }
         }, function(error){
             self.message = {type: "error", header: "Error", message: error};
         });
         
+    };
+    
+    function selectFigure(){
+        self.endTurn();
+    };
+    
+    self.endTurn = function(){
+        self.deactivateDice();
+        self.resetDice();
+        self.activeNextPlayer();
+        self.phase = 0;
+    };
+    
+    self.getChain = function(){
+        var chain = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    chain.push({row: i, column: j});
+                }
+            } 
+        }
+        
+        var response = [];
+        for(var i = 0, len = chain.length; i < len; i++){
+            if(_.findIndex(chain, {row: chain[i].row - 1, column: chain[i].column}) != -1 || 
+                _.findIndex(chain, {row: chain[i].row, column: chain[i].column + 1}) != -1 ||
+                _.findIndex(chain, {row: chain[i].row + 1, column: chain[i].column}) != -1 ||
+                _.findIndex(chain, {row: chain[i].row, column: chain[i].column - 1}) != -1){
+                response.push(chain[i]);
+            }
+        }
+        
+        return response.length >= 4 ? response : false;
     };
     
     self.throwDice = function(){
