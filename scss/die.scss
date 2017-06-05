@@ -39,29 +39,26 @@
 
 .ui.segment.die{
     background-size: cover;
+    border: none !important;
     @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "white", "black"));}}
     &.die-cross{@include background-svg(cross-faced("white", "black"));}
     
     &.black{
-        border: none;
         @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "black", "white"));}}
         &.die-cross{@include background-svg(cross-faced("black", "white"));}
     }
     
     &.red{
-        border: none;
         @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#f42a2a", "black"));}}
         &.die-cross{@include background-svg(cross-faced("#f42a2a", "black"));}
     }
     
     &.green{
-        border: none;
         @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#44bf12", "black"));}}
         &.die-cross{@include background-svg(cross-faced("#44bf12", "black"));}
     }
     
     &.blue{
-        border: none;
         @for $i from 0 through 6 {&.die-#{$i}{@include background-svg(number-faced($i, "#2459ea", "white"));}}
         &.die-cross{@include background-svg(cross-faced("#2459ea", "white"));}
     }

@@ -70,9 +70,7 @@
                 <div class="centered row">
                     <div id="board">
                         <div ng-repeat="row in ctrl.board.rows">
-                            <span ng-repeat="number_card in row">
-                                <number-card ng-click="number_card.active = !number_card.active" number-card="number_card"></number-card>
-                            </span>
+                            <number-card ng-repeat="number_card in row" ng-click="number_card.active = !number_card.active" number-card="number_card"></number-card>
                         </div>
                     </div>
                 </div>

@@ -1,2 +1,4 @@
 #board {
   margin: 10px 0px; }
+  #board > div {
+    margin-bottom: 2px; }

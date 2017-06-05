@@ -1,5 +1,5 @@
 number-card {
-    .segments{
+    .ui.segments{
         font-size: 1.5em;
         background: #9E9E9E;
         border: 2px solid #3c3c3c;
@@ -10,6 +10,10 @@ number-card {
         &.active{
             border-color: rgba(255, 255, 0, 0.83);
             background: rgba(255, 255, 0, 0.83);
+        }
+        
+        & > .ui.segments{
+            border: none;
         }
     }
 }

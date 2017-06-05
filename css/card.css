@@ -1,10 +1,12 @@
-number-card .segments {
+number-card .ui.segments {
   font-size: 1.5em;
   background: #9E9E9E;
   border: 2px solid #3c3c3c;
   padding: 2px;
   border-radius: 5px;
   cursor: pointer; }
-  number-card .segments.active {
+  number-card .ui.segments.active {
     border-color: rgba(255, 255, 0, 0.83);
     background: rgba(255, 255, 0, 0.83); }
+  number-card .ui.segments > .ui.segments {
+    border: none; }
