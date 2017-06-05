@@ -1,4 +1,4 @@
-app.controller("GameController", function(Player, Deck, Board) {
+app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(Player, Deck, Board, $scope) {
     var self = this;
    
     self.deck = new Deck();
@@ -30,21 +30,23 @@ app.controller("GameController", function(Player, Deck, Board) {
     };
     
     self.playTurn = function(){
+        self.message = false;
+        
         var selected_card = _.filter(self.active_player.hand, "active");
         var selected_dice = _.filter(self.dice, "active");
 
         if(selected_card.length == 0){
-            console.log("Select one card to play");
+            self.message = {type: "error", header: "Error", message: "Select one card to play"};
             return false;
         }
         
         if(selected_card.length > 1){
-            console.log("Select just one card to play");
+            self.message = {type: "error", header: "Error", message: "Select just one card to play"};
             return false;
         }
         
         if(selected_dice.length != 2){
-            console.log("Select two dice to throw");
+            self.message = {type: "error", header: "Error", message: "Select two dice to throw"};
             return false;
         }
         
@@ -54,9 +56,10 @@ app.controller("GameController", function(Player, Deck, Board) {
             self.activeNextPlayer();
             self.throwDice();
             self.deactivateDice();
+            self.resetDice();
         })
         .catch(function(error){
-            console.log(error);
+            self.message = {type: "error", header: "Error", message: error};
         });
         
     };
@@ -64,6 +67,12 @@ app.controller("GameController", function(Player, Deck, Board) {
     self.throwDice = function(){
         _.forEach(_.filter(self.dice, "active"), function(die){
             die.number = _.random(1, 6);
+        });
+    };
+    
+    self.resetDice = function(){
+        _.forEach(self.dice, function(die){
+            die.number = null;
         });
     };
     
@@ -97,4 +106,5 @@ app.controller("GameController", function(Player, Deck, Board) {
             self.active_player = self.players[next_index];
         }
     };
-});
+    
+}]);

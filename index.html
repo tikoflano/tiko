@@ -13,6 +13,7 @@
         <link rel="stylesheet" type="text/css" href="css/dice.css"/>
         <link rel="stylesheet" type="text/css" href="css/board.css"/>
         <link rel="stylesheet" type="text/css" href="css/player.css"/>
+        <link rel="stylesheet" type="text/css" href="css/messages.css"/>
         
         <script src="jquery/jquery-3.2.1.min.js"></script>
         <script src="semantic/semantic.min.js"></script>
@@ -31,9 +32,22 @@
             <div class="ui celled grid">
                 <div id="actions" class="row">
                     <div class="column">
-                        <input type="text" ng-model="new_player_name"/>
-                        <button ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''">Agregar</button>
-                        <button ng-click="ctrl.playTurn()">Jugar turno</button>
+                        <div class="ui action input">
+                            <input type="text" placeholder="Nombre">
+                            <button class="ui button" ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar</button>
+                        </div>
+                        <button class="ui labeled right floated icon blue button" ng-click="ctrl.playTurn()">
+                            <i class="play icon"></i>Jugar turno
+                        </button>
+                    </div>
+                </div>
+                <div id="messages" class="row" ng-if="ctrl.message">
+                    <div class="ui icon message" ng-class="ctrl.message.type">
+                        <i class="warning circle icon"></i>
+                        <div class="content">
+                            <div class="header">{{ctrl.message.header}}</div>
+                            <p>{{ctrl.message.message}}</p>
+                        </div>
                     </div>
                 </div>
                 <div id="players" class="equal width row">
