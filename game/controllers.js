@@ -111,6 +111,21 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     function selectFigure(){
         self.message = false;
         
+        var selected_cards = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].active){
+                    selected_cards.push(self.board.rows[i][j]);
+                }
+            } 
+        }
+        
+        if(selected_cards.length != 4){
+            self.message = {type: "error", header: "Error", message: "Select 4 cards"};
+            return false;
+        }
+        
+        
         self.endTurn();
     };
     
