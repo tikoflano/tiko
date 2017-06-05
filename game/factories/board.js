@@ -39,6 +39,10 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
             return $q.reject("Select one position in the board");
         }
         
+        if(!this.rows[selected_position.row][selected_position.column].isEmpty()){
+            return $q.reject("Select an empty position in the board");
+        }
+        
         if(empty && (selected_position.row != (this.rows.length - 1) / 2 || selected_position.column != (this.rows[0].length - 1) / 2)){
             return $q.reject("The first card must be placed in the center");
         }
