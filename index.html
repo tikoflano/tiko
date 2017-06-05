@@ -35,7 +35,7 @@
                 <div id="actions" class="row">
                     <div class="column">
                         <div class="ui action input">
-                            <input type="text" placeholder="Nombre">
+                            <input type="text" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
                             <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
                         </div>
                         <button class="ui labeled right floated icon blue button" ng-click="ctrl.playTurn()">
@@ -80,14 +80,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <card card="ctrl.players[0].player_cards[0]"></card>
-
-            <hr class="clear">
-
-            <div ng-repeat="number_card in ctrl.deck.cards">
-                <card card="number_card"></card>
             </div>
         </div>
     </body>
