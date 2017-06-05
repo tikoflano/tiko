@@ -4,6 +4,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
     self.phase = 0;
     self.phases = [
         {text: "Jugar carta", fn: playCard},
+        {text: "Lanzar dado", fn: throwDice},
         {text: "Seleccionar figura", fn: selectFigure}
     ];
    
@@ -40,7 +41,6 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         self.message = false;
         
         var selected_card = _.filter(self.active_player.hand, "active");
-        var selected_dice = _.filter(self.dice, "active");
 
         if(selected_card.length == 0){
             self.message = {type: "error", header: "Error", message: "Select one card to play"};
@@ -52,57 +52,70 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
             return false;
         }
         
-        if(selected_dice.length != 2){
-            self.message = {type: "error", header: "Error", message: "Select two dice to throw"};
-            return false;
-        }
-        
         self.board.playCard(selected_card[0])
         .then(function(){
-            self.active_player.removeCard(selected_card[0]).refillHand(self.deck);
-            
-            self.throwDice();
-            
-            //Check cards number
-            var number_hitted = false;
-            for(var i = 0, len = self.board.rows.length; i < len; i++){
-                for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                    if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
-                        _.forEach(_.filter(self.dice, "active"), function(die){
-                            if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
-                                self.board.rows[i][j] = self.active_player.player_cards.pop();
-                                number_hitted = true;
-                                return false;
-                            }
-                        });
-                    }
-                } 
-            }
-            
-            //Check groups of 4+ if any card number was hitted
-            if(number_hitted){
-                var chain = self.getChain();
-                if(!chain){
-                    self.endTurn();
-                }
-                else{
-                    self.phase = 1;
-                }
-            }
-            else{
-                self.endTurn();
-            }
+            self.active_player.removeCard(selected_card[0]);
+            self.phase = 1;
         }, function(error){
             self.message = {type: "error", header: "Error", message: error};
         });
         
     };
     
+    function throwDice(){
+        self.message = false;
+        
+        var selected_dice = _.filter(self.dice, "active");
+        
+        if(selected_dice.length != 2){
+            self.message = {type: "error", header: "Error", message: "Select two dice to throw"};
+            return false;
+        }
+        
+        _.forEach(_.filter(self.dice, "active"), function(die){
+            die.number = _.random(1, 6);
+            console.log(die.color, die.number);
+        })
+        
+        //Check cards number
+        var number_hitted = false;
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
+                    _.forEach(_.filter(self.dice, "active"), function(die){
+                        if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
+                            self.board.rows[i][j] = self.active_player.player_cards.pop();
+                            number_hitted = true;
+                            return false;
+                        }
+                    });
+                }
+            } 
+        }
+
+        //Check groups of 4+ if any card number was hitted
+        if(number_hitted){
+            var chain = self.getChain();
+            if(!chain){
+                self.endTurn();
+            }
+            else{
+                self.phase = 2;
+            }
+        }
+        else{
+            self.endTurn();
+        }
+    };
+    
     function selectFigure(){
+        self.message = false;
+        
         self.endTurn();
     };
     
     self.endTurn = function(){
+        self.active_player.refillHand(self.deck);
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
@@ -130,13 +143,6 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         }
         
         return response.length >= 4 ? response : false;
-    };
-    
-    self.throwDice = function(){
-        _.forEach(_.filter(self.dice, "active"), function(die){
-            die.number = _.random(1, 6);
-            console.log(die.color, die.number);
-        });
     };
     
     self.resetDice = function(){
