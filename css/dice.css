@@ -1,7 +1,5 @@
-#dice {
-  font-size: 2em; }
-  #dice .die {
-    opacity: 0.25;
-    cursor: pointer; }
-    #dice .die.active {
-      opacity: 1; }
+#dice .die {
+  opacity: 0.25;
+  cursor: pointer; }
+  #dice .die.active {
+    opacity: 1; }
