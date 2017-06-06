@@ -55,3 +55,16 @@ app.factory("PlayerCard", function(Card){
     
     return PlayerCard;
 });
+
+app.factory("ActionCard", function(Card){
+    var self = this;
+    
+    var ActionCard = function(action){
+        this.type = "action";
+        this.action = action;
+    };
+    ActionCard.prototype = new Card();
+    ActionCard.prototype.constructor = ActionCard;
+    
+    return ActionCard;
+});
