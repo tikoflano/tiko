@@ -1,4 +1,4 @@
-app.controller("GameController", ["Player", "Deck", "Board", function(Player, Deck, Board) {
+app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Player, Deck, Board, $q) {
     var self = this;
     
     self.phase = {};
@@ -26,26 +26,30 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         }
     };
     
+    self.playPhase = function(){
+        self.phase.fn(self.phase.args)
+        .catch(function(error){
+            self.message = {type: "error", header: "Error", message: error};
+        });
+    };
+    
     self.playCard = function(){
         self.message = false;
         
         var selected_card = _.filter(self.active_player.hand, "active");
 
         if(selected_card.length == 0){
-            self.message = {type: "error", header: "Error", message: "Select one card to play"};
-            return false;
+            return $q.reject("Select one card to play");
         }
         
         if(selected_card.length > 1){
-            self.message = {type: "error", header: "Error", message: "Select just one card to play"};
-            return false;
+            return $q.reject("Select just one card to play");
         }
         
-        selected_card[0].play(self)
+        var player = self.active_player;
+        return selected_card[0].play(self)
         .then(function(){
-            self.active_player.removeCard(selected_card[0]);
-        }, function(error){
-            self.message = {type: "error", header: "Error", message: error};
+            player.removeCard(selected_card[0]);
         });
         
     };
@@ -56,8 +60,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         var selected_dice = _.filter(self.dice, "active");
         
         if(selected_dice.length != amount){
-            self.message = {type: "error", header: "Error", message: "Select "+amount+" dice to throw"};
-            return false;
+            return $q.reject("Select "+amount+" dice to throw");
         }
         
         _.forEach(_.filter(self.dice, "active"), function(die){
@@ -85,7 +88,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         if(number_hitted){
             var chains = self.getChains();
             if(!chains.length){
-                self.endTurn();
+                return self.endTurn();
             }
             else{
                 console.log(chains);
@@ -93,7 +96,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
             }
         }
         else{
-            self.endTurn();
+            return self.endTurn();
         }
     };
     
@@ -118,11 +121,12 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
     };
     
     self.endTurn = function(){
-        self.active_player.refillHand(self.deck);
+        self.active_player.deactivateHand().refillHand(self.deck);
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
         self.phase = {text: "Jugar carta", fn: self.playCard};
+        return $q.resolve();
     };
     
     self.getChains = function(){

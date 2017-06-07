@@ -39,7 +39,7 @@
                             <input type="text" ng-model="new_player_name" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
                             <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
                         </div>
-                        <button class="ui labeled right floated icon blue button" ng-click="ctrl.phase.fn(ctrl.phase.args)">
+                        <button class="ui labeled right floated icon blue button" ng-click="ctrl.playPhase()">
                             <i class="play icon"></i>{{ctrl.phase.text}}
                         </button>
                     </div>
@@ -49,9 +49,11 @@
                         <div class="ui compact segment player" ng-class="{active: player.active}">
                             <span class="name" ng-style="{background: player.color}">{{player.name}} {{player.player_cards.length}}</span>
                             <div class="hand">
-                                <span ng-repeat="number_card in player.hand">
-                                    <card card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></card>
-                                </span>
+                                <div class="ui horizontal segments" >
+                                    <div class="ui segment" ng-repeat="number_card in player.hand" >
+                                        <card card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></card>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

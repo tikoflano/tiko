@@ -13,3 +13,5 @@
     text-transform: uppercase;
     font-weight: bold;
     margin-bottom: 5px; }
+  #players .player .hand > .horizontal.segments > .ui.segment {
+    padding: 0px; }

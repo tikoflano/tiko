@@ -21,9 +21,12 @@ app.factory("Player", function(PlayerCard){
     };
     
     Player.prototype.removeCard = function(card){
-        _.remove(this.hand, function(x){
-            return x == card;
-        });
+        _.remove(this.hand, card);
+        return this;
+    };
+    
+    Player.prototype.deactivateHand = function(){
+        _.each(this.hand, function(card){ card.active = false; });
         return this;
     };
     
