@@ -1,10 +1,10 @@
-app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(Player, Deck, Board, $scope) {
+app.controller("GameController", ["Player", "Deck", "Board", function(Player, Deck, Board) {
     var self = this;
     
     self.phase = 0;
     self.phases = [
         {text: "Jugar carta", fn: playCard},
-        {text: "Lanzar dado", fn: throwDice},
+        {text: "Lanzar dados", fn: throwDice},
         {text: "Seleccionar figura", fn: selectFigure}
     ];
    
@@ -48,10 +48,9 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
             return false;
         }
         
-        selected_card[0].play(self.board)
+        selected_card[0].play(self)
         .then(function(){
             self.active_player.removeCard(selected_card[0]);
-            self.phase = 1;
         }, function(error){
             self.message = {type: "error", header: "Error", message: error};
         });
