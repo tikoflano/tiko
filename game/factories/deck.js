@@ -21,8 +21,6 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             this.cards.push(new NumberCard(i, i, i));
         }
         
-        this.shuffle();
-        
         //Action Cards        
         this.cards.unshift(new ActionCard("Finalizar turno", function(ctrl){
             ctrl.active_player.removeCard(this);
@@ -86,6 +84,8 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             reset();
             return $q.resolve();
         }));
+        
+        this.shuffle();
     };
     
     

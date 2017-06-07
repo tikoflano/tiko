@@ -32,5 +32,13 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
         return true;
     };
     
+    Board.prototype.deactivate = function(){
+        for(var i = 0, len = this.rows.length; i < len; i++){
+            for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
+                this.rows[i][j].active = false;
+            } 
+        }
+    };
+    
     return Board;
 }]);

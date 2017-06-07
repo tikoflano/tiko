@@ -93,6 +93,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             else{
                 console.log(chains);
                 self.phase = {text: "Seleccionar figura", fn: self.selectFigure};
+                return $q.resolve();
             }
         }
         else{
@@ -106,22 +107,24 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].active){
-                    selected_cards.push(self.board.rows[i][j]);
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    selected_cards.push({row: i, column: j, card: self.board.rows[i][j]});
                 }
             } 
         }
         
         if(selected_cards.length != 4){
-            self.message = {type: "error", header: "Error", message: "Select 4 cards"};
-            return false;
+            return $q.reject("Select contiguous 4 cards of your color");
         }
+        
+        console.log(selected_cards);
 
-        self.endTurn();
+        return self.endTurn();
     };
     
     self.endTurn = function(){
         self.active_player.deactivateHand().refillHand(self.deck);
+        self.board.deactivate();
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
