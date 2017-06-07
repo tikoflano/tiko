@@ -65,40 +65,119 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         
         _.forEach(_.filter(self.dice, "active"), function(die){
             die.number = _.random(1, 6);
-            console.log(die.color, die.number);
-        })
+        });
         
+        self.phase = {text: "Comprobar resultados", fn: self.checkHits};
+        return $q.resolve();
+    };
+    
+    self.checkHits = function(){
         //Check cards number
-        var number_hitted = false;
+        var hit_cards = [];
+        var player_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    player_cards.push({row: i, column: j});
+                }
                 if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
                     _.forEach(_.filter(self.dice, "active"), function(die){
                         if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
-                            self.board.rows[i][j] = self.active_player.player_cards.pop();
-                            number_hitted = true;
+                            hit_cards.push({row: i, column: j});
                             return false;
                         }
                     });
                 }
             } 
         }
-
-        //Check groups of 4+ if any card number was hitted
-        if(number_hitted){
-            var chains = self.getChains();
-            if(!chains.length){
-                return self.endTurn();
+        
+        if(!hit_cards.length){
+            return self.endTurn();
+        }
+        
+        if(hit_cards.length <= self.active_player.player_cards.length){
+            for(var i = 0, len = hit_cards.length; i < len; i++){
+                self.board.rows[hit_cards[i].row][hit_cards[i].column] = self.active_player.player_cards.pop();
+            }
+            return self.checkChains();
+        }
+        else if(hit_cards.length > self.active_player.player_cards.length){
+            
+            if(hit_cards.length > (self.active_player.player_cards.length + player_cards.length)){
+                _.forEach(player_cards, function(card){
+                    self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
+                    self.board.removeCardInCell(card.row, card.column);
+                });
+                self.phase = {text: "Seleccionar "+self.active_player.player_cards.length+" carta(s) de número", fn: self.selectHitNumberCards, args: hit_cards};
+                return $q.resolve();
             }
             else{
-                console.log(chains);
-                self.phase = {text: "Seleccionar figura", fn: self.selectFigure};
+                var amount = hit_cards.length - self.active_player.player_cards.length;
+                self.phase = {text: "Seleccionar "+amount+" carta(s) de jugador", fn: self.selectPlayerCards, args: amount};
                 return $q.resolve();
             }
         }
-        else{
+    };
+    
+    self.checkChains = function(){
+        var chains = self.getChains();
+        if(!chains.length){
             return self.endTurn();
         }
+        else{
+            console.log(chains);
+            self.phase = {text: "Seleccionar figura", fn: self.selectFigure};
+            return $q.resolve();
+        }
+    };
+    
+    self.selectHitNumberCards = function(cards_hit){
+        self.message = false;
+        
+        var amount = self.active_player.player_cards.length;
+        
+        var selected_cards = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "number" && _.find(cards_hit, {row: i, column: j})){
+                    selected_cards.push({row: i, column: j});
+                }
+            } 
+        }
+        
+        if(selected_cards.length != amount){
+            return $q.reject("Select "+amount+" card(s) with the hit numbers");
+        }
+        
+        for(var i = 0, len = selected_cards.length; i < len; i++){
+            self.board.rows[selected_cards[i].row][selected_cards[i].column] = self.active_player.player_cards.pop();
+        }
+        
+        return self.checkChains();
+    };
+    
+    self.selectPlayerCards = function(amount){
+        self.message = false;
+        
+        var selected_cards = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    selected_cards.push({row: i, column: j});
+                }
+            } 
+        }
+        
+        if(selected_cards.length != amount){
+            return $q.reject("Select "+amount+" cards of your color");
+        }
+        
+        _.forEach(selected_cards, function(card){
+            self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
+            self.board.removeCardInCell(card.row, card.column);
+        });
+        
+        return self.checkHits();
     };
     
     self.selectFigure = function(){
@@ -108,7 +187,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
                 if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
-                    selected_cards.push({row: i, column: j, card: self.board.rows[i][j]});
+                    selected_cards.push({row: i, column: j});
                 }
             } 
         }
@@ -116,6 +195,11 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         if(selected_cards.length != 4){
             return $q.reject("Select contiguous 4 cards of your color");
         }
+        
+        _.forEach(selected_cards, function(card){
+            self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
+            self.board.removeCardInCell(card.row, card.column);
+        });
         
         console.log(selected_cards);
 

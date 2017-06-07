@@ -6,7 +6,7 @@ app.factory("Player", function(PlayerCard){
         this.color = color;
         this.hand = [];
         this.active = false;
-        this.player_cards = new Array(6);
+        this.player_cards = new Array(4);
         
         for(var i = 0, len = this.player_cards.length; i < len; i++){
             this.player_cards[i] = new PlayerCard(this);

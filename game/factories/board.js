@@ -40,5 +40,9 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
         }
     };
     
+    Board.prototype.removeCardInCell = function(row, column){
+        this.rows[row][column] = new EmptyCard();
+    }; 
+    
     return Board;
 }]);
