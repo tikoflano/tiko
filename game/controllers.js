@@ -206,8 +206,9 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         }
         
         if(angular.isUndefined(active_player_index)){
-            self.players[0].active = true;
-            self.active_player = self.players[0];
+            var starting_player = _.random(self.players.length - 1);
+            self.players[starting_player].active = true;
+            self.active_player = self.players[starting_player];
         }
         else{
             var next_index = (active_player_index + 1) % (self.players.length);
