@@ -23,6 +23,7 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
         
         this.shuffle();
         
+        //Action Cards        
         this.cards.unshift(new ActionCard("Finalizar turno", function(ctrl){
             ctrl.active_player.removeCard(this);
             ctrl.endTurn();
@@ -33,8 +34,7 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             ctrl.phase = {text: "Lanzar 3 dados", fn: ctrl.throwDice, args: 3};
             return $q.resolve();
         }));
-        
-        
+             
         this.cards.unshift(new ActionCard("Intercambiar carta al rival", function(ctrl){
             function reset(){
                 _.forEach(ctrl.players, function(player) {
