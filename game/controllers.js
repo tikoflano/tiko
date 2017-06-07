@@ -48,7 +48,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
             return false;
         }
         
-        self.board.playCard(selected_card[0])
+        selected_card[0].play(self.board)
         .then(function(){
             self.active_player.removeCard(selected_card[0]);
             self.phase = 1;
