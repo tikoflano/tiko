@@ -1,13 +1,7 @@
 app.controller("GameController", ["Player", "Deck", "Board", function(Player, Deck, Board) {
     var self = this;
     
-    self.phase = 0;
-    self.phases = [
-        {text: "Jugar carta", fn: playCard},
-        {text: "Lanzar dados", fn: throwDice},
-        {text: "Seleccionar figura", fn: selectFigure}
-    ];
-   
+    self.phase = {};
     self.deck = new Deck();
     self.board = new Board(5, 5);
     self.dice = [
@@ -32,8 +26,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         }
     };
     
-    //Phases functions
-    function playCard(){
+    self.playCard = function(){
         self.message = false;
         
         var selected_card = _.filter(self.active_player.hand, "active");
@@ -57,13 +50,13 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         
     };
     
-    function throwDice(){
+    self.throwDice = function(amount){
         self.message = false;
         
         var selected_dice = _.filter(self.dice, "active");
         
-        if(selected_dice.length != 2){
-            self.message = {type: "error", header: "Error", message: "Select two dice to throw"};
+        if(selected_dice.length != amount){
+            self.message = {type: "error", header: "Error", message: "Select "+amount+" dice to throw"};
             return false;
         }
         
@@ -96,7 +89,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
             }
             else{
                 console.log(chains);
-                self.phase = 2;
+                self.phase = {text: "Seleccionar figura", fn: self.selectFigure};
             }
         }
         else{
@@ -104,7 +97,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         }
     };
     
-    function selectFigure(){
+    self.selectFigure = function(){
         self.message = false;
         
         var selected_cards = [];
@@ -120,8 +113,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
             self.message = {type: "error", header: "Error", message: "Select 4 cards"};
             return false;
         }
-        
-        
+
         self.endTurn();
     };
     
@@ -130,7 +122,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
-        self.phase = 0;
+        self.phase = {text: "Jugar carta", fn: self.playCard};
     };
     
     self.getChains = function(){
@@ -193,6 +185,7 @@ app.controller("GameController", ["Player", "Deck", "Board", function(Player, De
     self.init = function(){
         self.addPlayer("a");
         self.addPlayer("b");
+        self.phase = {text: "Jugar carta", fn: self.playCard};
     };
     
     self.activeNextPlayer = function(){

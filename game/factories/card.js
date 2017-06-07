@@ -76,7 +76,7 @@ app.factory("NumberCard", function(Card, $q){
         ctrl.board.rows[selected_position.row][selected_position.column] = this;
         ctrl.board.rows[selected_position.row][selected_position.column].active = false;
         
-        ctrl.phase = 1;
+        ctrl.phase = {text: "Lanzar dados", fn: ctrl.throwDice, args: 2};
         
         return $q.resolve();
     };
