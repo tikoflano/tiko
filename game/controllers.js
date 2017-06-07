@@ -10,16 +10,12 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
    
     self.deck = new Deck();
     self.board = new Board(5, 5);
-    
     self.dice = [
         {color: "black", selected: false, number: null},
         {color: "green", selected: false, number: null},
         {color: "blue", selected: false, number: null}
     ];
-    
-    self.players = [];
-    self.next_card = {};
-    
+    self.players = [];    
     self.active_player = {};
     
     self.addPlayer = function(name){
@@ -95,11 +91,12 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
 
         //Check groups of 4+ if any card number was hitted
         if(number_hitted){
-            var chain = self.getChain();
-            if(!chain){
+            var chains = self.getChains();
+            if(!chains.length){
                 self.endTurn();
             }
             else{
+                console.log(chains);
                 self.phase = 2;
             }
         }
@@ -137,27 +134,49 @@ app.controller("GameController", ["Player", "Deck", "Board", "$scope", function(
         self.phase = 0;
     };
     
-    self.getChain = function(){
-        var chain = [];
+    self.getChains = function(){
+        var filtered = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
                 if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
-                    chain.push({row: i, column: j});
+                    filtered.push({row: i, column: j});
                 }
-            } 
-        }
-        
-        var response = [];
-        for(var i = 0, len = chain.length; i < len; i++){
-            if(_.findIndex(chain, {row: chain[i].row - 1, column: chain[i].column}) != -1 || 
-                _.findIndex(chain, {row: chain[i].row, column: chain[i].column + 1}) != -1 ||
-                _.findIndex(chain, {row: chain[i].row + 1, column: chain[i].column}) != -1 ||
-                _.findIndex(chain, {row: chain[i].row, column: chain[i].column - 1}) != -1){
-                response.push(chain[i]);
             }
         }
+
+        var groups = [];
+        var checked = [];
+
+        for(var i = 0, len = filtered.length; i < len; i++){
+            if(!_.find(checked, filtered[i])){
+                var group = [filtered[i]];
+                findNeighbors(filtered[i], group, checked);
+                if(group.length >= 4){
+                    groups.push(group);
+                }
+            }
+        }
+
+        function findNeighbors(element, group, checked){
+            checked.push(element);
+
+            var neighbors = [
+                {row: element.row - 1, column: element.column},
+                {row: element.row, column: element.column + 1},
+                {row: element.row + 1, column: element.column},
+                {row: element.row, column: element.column - 1},
+            ];
+
+            for(var i = 0, len = neighbors.length; i < len; i++){
+                var neighbor = _.find(filtered, neighbors[i]);
+                if(neighbor && !_.find(checked, neighbors[i])){
+                    group.push(neighbor);
+                    findNeighbors(neighbor, group, checked);
+                }
+            }	
+        }
         
-        return response.length >= 4 ? response : false;
+        return groups;
     };
     
     self.resetDice = function(){

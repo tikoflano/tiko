@@ -56,7 +56,7 @@ app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
                 (selected_position.row + 1 >= this.rows.length || this.rows[selected_position.row + 1][selected_position.column].isEmpty()) &&
                 (selected_position.column <= 0 || this.rows[selected_position.row][selected_position.column - 1].isEmpty())
             )){
-            return $q.reject("Select one position next to a number card in the board");
+            return $q.reject("Select one position next to a card in the board");
         }
         
         this.rows[selected_position.row][selected_position.column] = card;
