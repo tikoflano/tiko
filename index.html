@@ -32,7 +32,7 @@
     </head>
     <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="$event.key == ' ' && ctrl.playPhase()">
         <div class="ui container">
-            <div class="ui celled grid">
+            <div class="ui grid">
                 <div id="actions" class="row">
                     <div class="column">
                         <input type="color" ng-model="new_player_color" ng-disabled="ctrl.players.length >= 2">
