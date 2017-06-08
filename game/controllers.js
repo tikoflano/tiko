@@ -14,8 +14,8 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
     self.active_player = {};
     
     self.init = function(){
-        self.addPlayer("a");
-        self.addPlayer("b");
+        self.addPlayer("John Doe");
+        self.addPlayer("Robin Hood");
     };
     
     self.playPhase = function(){
@@ -239,18 +239,20 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         var selected_cards = [];
         for(var i = 0, len = self.active_player.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.active_player.board.rows[i].length; j < len2; j++){
-                if(self.active_player.board.rows[i][j].active && self.board.rows[i][j].type == "empty"){
+                if(self.active_player.board.rows[i][j].active && self.active_player.board.rows[i][j].type == "empty"){
                     selected_cards.push({row: i, column: j});
                 }
             } 
         }
         
-        if(selected_cards.length != figure.length){
+        if(!selected_cards.length){
             return $q.reject("Select "+figure.length+" spaces forming the shape");
         }
         
-        var chains = self.getChains(selected_cards);
-        if(chains.length != 1){
+        var min_figure = minFigure(figure);
+        var min_selected_cards = minFigure(selected_cards);
+        
+        if(!_.isEqual(min_figure, min_selected_cards)){
             return $q.reject("Select "+figure.length+" spaces forming the shape");
         }
         
@@ -260,6 +262,14 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         
         $scope.$broadcast("hide-board");
         return self.endTurn();
+    };
+    
+    function minFigure(figure){
+        var min_row = _.minBy(figure, "row").row;
+        var min_column = _.minBy(figure, "column").column;
+        return  _.map(figure, function(coords){
+            return {row: coords.row - min_row, column: coords.column - min_column}
+        });
     };
     
     self.getChains = function(cells){
