@@ -13,18 +13,9 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
     self.players = [];    
     self.active_player = {};
     
-    self.addPlayer = function(name){
-        if(self.players.length >= 2){
-            self.message = {type: "error", header: "Error", message: "Can't add more players"};
-            return false;
-        }
-        var player = new Player(name, self.players.length ? "#03A9F4" : "#FF5722");
-        player.refillHand(self.deck);
-        self.players.push(player);
-        
-        if(self.players.length == 2){
-            self.phase = {text: "Iniciar partida", fn: self.startGame};
-        }
+    self.init = function(){
+        self.addPlayer("a");
+        self.addPlayer("b");
     };
     
     self.playPhase = function(){
@@ -39,6 +30,28 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         });
     };
     
+    self.addPlayer = function(name){
+        if(self.players.length >= 2){
+            self.message = {type: "error", header: "Error", message: "Can't add more players"};
+            return false;
+        }
+        var player = new Player(name, self.players.length ? "#03A9F4" : "#FF5722");
+        player.refillHand(self.deck);
+        self.players.push(player);
+        
+        if(self.players.length == 2){
+            self.phase = {text: "Iniciar partida", fn: self.startGame};
+        }
+    };
+    
+    self.startGame = function(){
+        var starting_player = _.random(self.players.length - 1);
+        self.players[starting_player].active = true;
+        self.active_player = self.players[starting_player];
+        
+        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
+    };
+    
     self.playCard = function(){
         var selected_card = _.filter(self.active_player.hand, "active");
 
@@ -48,6 +61,10 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         
         if(selected_card.length > 1){
             return $q.reject("Select just one card to play");
+        }
+        
+        if(self.board.isFull() && selected_card[0].type != "action"){
+            return $q.reject("The board is full. Play an action card.");
         }
         
         var player = self.active_player;
@@ -215,15 +232,6 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         return self.endTurn();
     };
     
-    self.endTurn = function(){
-        self.active_player.deactivateHand().refillHand(self.deck);
-        self.board.deactivate();
-        self.deactivateDice();
-        self.resetDice();
-        self.activeNextPlayer();
-        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
-    };
-    
     self.getChains = function(cells){
         var groups = [];
         var checked = [];
@@ -260,6 +268,21 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         return groups;
     };
     
+    self.endTurn = function(){
+        self.active_player.deactivateHand().refillHand(self.deck);
+        self.board.deactivate();
+        self.deactivateDice();
+        self.resetDice();
+        self.activeNextPlayer();
+        
+        if(!self.board.isFull() || self.active_player.hasActionCard()){
+            return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
+        }
+        else{
+            return $q.resolve({text: "Lanzar 2 dados", fn: self.throwDice});
+        }
+    };
+    
     self.resetDice = function(){
         _.forEach(self.dice, function(die){
             die.number = null;
@@ -270,19 +293,6 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         _.forEach(self.dice, function(die){
             die.active = false;
         });
-    };
-    
-    self.init = function(){
-        self.addPlayer("a");
-        self.addPlayer("b");
-    };
-    
-    self.startGame = function(){
-        var starting_player = _.random(self.players.length - 1);
-        self.players[starting_player].active = true;
-        self.active_player = self.players[starting_player];
-        
-        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
     };
     
     self.activeNextPlayer = function(){

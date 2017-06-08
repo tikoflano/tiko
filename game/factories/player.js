@@ -13,6 +13,16 @@ app.factory("Player", function(Config, PlayerCard, Board){
         }
     };
     
+    Player.prototype.hasActionCard = function(){
+        for(var i = 0, len = this.hand.length; i < len; i++){
+            if(this.hand[i].type == "action"){
+                return true;
+            }
+        }
+        
+        return false;
+    };
+    
     Player.prototype.refillHand = function(deck){
         while(this.hand.length < Config.player.hand_size){
             this.hand.push(deck.cards.shift());
