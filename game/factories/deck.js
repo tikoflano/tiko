@@ -79,7 +79,7 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
                 target_cards[0].active = false;
                 active_player_cards[0].active = false;
                 
-                return $q.resolve({text: "Lanzar 2 dados", fn: ctrl.throwDice});                
+                return ctrl.board.isEmpty() ? ctrl.endTurn() : $q.resolve({text: "Lanzar 2 dados", fn: ctrl.throwDice});                
             }});
         }));
         
