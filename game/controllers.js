@@ -22,7 +22,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         self.players.push(player);
         
         if(self.players.length == 2){
-            self.activeNextPlayer();
+            self.phase = {text: "Iniciar partida", fn: self.startGame};
         }
     };
     
@@ -276,7 +276,15 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     self.init = function(){
         self.addPlayer("a");
         self.addPlayer("b");
+    };
+    
+    self.startGame = function(){
+        var starting_player = _.random(self.players.length - 1);
+        self.players[starting_player].active = true;
+        self.active_player = self.players[starting_player];
+        
         self.phase = {text: "Jugar carta de la mano", fn: self.playCard};
+        return $q.resolve();
     };
     
     self.activeNextPlayer = function(){
@@ -288,16 +296,9 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             }
         }
         
-        if(angular.isUndefined(active_player_index)){
-            var starting_player = _.random(self.players.length - 1);
-            self.players[starting_player].active = true;
-            self.active_player = self.players[starting_player];
-        }
-        else{
-            var next_index = (active_player_index + 1) % (self.players.length);
-            self.players[next_index].active = true;
-            self.active_player = self.players[next_index];
-        }
+        var next_index = (active_player_index + 1) % (self.players.length);
+        self.players[next_index].active = true;
+        self.active_player = self.players[next_index];
     };
     
 }]);
