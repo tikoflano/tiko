@@ -1,0 +1,49 @@
+<div class="ui modal">
+    <div class="header">
+        Player Board - {{ctrl.player.name}}
+    </div>
+    <div class="content">
+        <div class="ui grid">
+            <div id="player-messages" class="row">
+                <div class="ui icon message" ng-if="ctrl.phase">
+                    <i class="info circle icon"></i>
+                    <div class="content">
+                        <div class="header">Fase actual</div>
+                        <p>{{ctrl.phase.text}}</p>
+                    </div>
+                </div>
+                <div class="ui icon message" ng-if="ctrl.message" ng-class="ctrl.message.type">
+                    <i class="warning circle icon"></i>
+                    <div class="content">
+                        <div class="header">{{ctrl.message.header}}</div>
+                        <p>{{ctrl.message.message}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="centered row">
+                <div class="ui divided grid">
+                    <div class="two column middle aligned row">
+                        <div class="column">
+                            <b>Agregar figura</b>
+                        </div>
+                        <div class="column">
+                            <figure figure="ctrl.figure"></figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="board centered row">
+                <div class="ui compact segments">
+                    <div class="ui horizontal segments" ng-repeat="row in ctrl.player.board.rows">
+                        <div class="ui segment" ng-repeat="card in row" >
+                            <card ng-click="card.active = !card.active" card="card"></card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui positive button" ng-click="ctrl.player.hideBoard()">Aceptar</div>
+    </div>
+</div>

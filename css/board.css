@@ -1,5 +1,5 @@
-#board {
+.board {
   padding: 10px 0px; }
-  #board > .ui.segments > .ui.segments > .ui.segment {
+  .board > .ui.segments > .ui.segments > .ui.segment {
     height: 64px;
     padding: 0px; }

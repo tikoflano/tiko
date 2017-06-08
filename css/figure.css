@@ -1,0 +1,10 @@
+.figure .row {
+  margin-bottom: -4px; }
+.figure .cell {
+  display: inline-block;
+  background: black;
+  width: 20px;
+  height: 20px;
+  border: 1px solid white; }
+  .figure .cell.empty {
+    background: white; }

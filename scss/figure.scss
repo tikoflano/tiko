@@ -1,0 +1,18 @@
+$size: 20px;
+
+.figure{
+    .row{
+        margin-bottom: -4px;
+    }
+    .cell{
+        display: inline-block;
+        background: black;
+        width: $size;
+        height: $size;
+        border: 1px solid white;
+        
+        &.empty{
+            background: white;
+        }
+    }
+}

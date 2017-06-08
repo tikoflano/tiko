@@ -1,9 +1,9 @@
-app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Player, Deck, Board, $q) {
+app.controller("GameController", function(Config, Player, Deck, Board, $q) {
     var self = this;
     
     self.phase = {};
     self.deck = new Deck();
-    self.board = new Board(5, 5);
+    self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
         {color: "black", selected: false, number: null},
         {color: "green", selected: false, number: null},
@@ -124,7 +124,6 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             return self.endTurn();
         }
         else{
-            console.log(chains);
             return $q.resolve({text: "Seleccionar figura", fn: self.selectFigure});
         }
     };
@@ -184,8 +183,8 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             } 
         }
         
-        if(selected_cards.length != 4){
-            return $q.reject("Select contiguous 4 cards of your color");
+        if(selected_cards.length != Config.figure.size){
+            return $q.reject("Select "+Config.figure.size+" contiguous cards of your color");
         }
         
         _.forEach(selected_cards, function(card){
@@ -193,7 +192,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             self.board.removeCardInCell(card.row, card.column);
         });
         
-        console.log(selected_cards);
+        self.active_player.addFigure(selected_cards);
 
         return self.endTurn();
     };
@@ -224,7 +223,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             if(!_.find(checked, filtered[i])){
                 var group = [filtered[i]];
                 findNeighbors(filtered[i], group, checked);
-                if(group.length >= 4){
+                if(group.length >= Config.figure.size){
                     groups.push(group);
                 }
             }
@@ -291,4 +290,4 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         self.active_player = self.players[next_index];
     };
     
-}]);
+});

@@ -14,6 +14,7 @@
         <link rel="stylesheet" type="text/css" href="css/board.css"/>
         <link rel="stylesheet" type="text/css" href="css/player.css"/>
         <link rel="stylesheet" type="text/css" href="css/messages.css"/>
+        <link rel="stylesheet" type="text/css" href="css/figure.css"/>
         
         <script src="jquery/jquery-3.2.1.min.js"></script>
         <script src="semantic/semantic.min.js"></script>
@@ -60,7 +61,7 @@
                 <div id="players" class="equal width row">
                     <div class="center aligned column" ng-repeat="player in ctrl.players" >
                         <div class="ui compact segment player" ng-class="{active: player.active}">
-                            <span class="name" ng-style="{background: player.color}">{{player.name}}</span>
+                            <span class="name" ng-click="player.showBoard()" ng-style="{background: player.color}">{{player.name}}</span>
                             <div class="player-cards">
                                 <span class="player-card" ng-repeat="player_card in player.player_cards" ng-style="{'background-color': player.color}"></span>
                                 <span ng-hide="player.player_cards.length">-</span>
@@ -72,6 +73,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <player-board player="player"></player-board>
                         </div>
                     </div>
                 </div>
@@ -80,7 +82,7 @@
                         <span class="ui die compact segment" ng-repeat="die in ctrl.dice" ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" ng-click="die.active = !die.active"></span>
                     </div>
                 </div>
-                <div id="board" class="centered row">
+                <div class="board centered row">
                     <div class="ui compact segments">
                         <div class="ui horizontal segments" ng-repeat="row in ctrl.board.rows">
                             <div class="ui segment" ng-repeat="number_card in row" >
