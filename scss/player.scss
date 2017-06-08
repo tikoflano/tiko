@@ -17,10 +17,31 @@
             text-transform: uppercase;
             font-weight: bold;
             margin-bottom: 5px;
+            border-radius: 5px;
         }
         
-        .hand > .horizontal.segments > .ui.segment{
-            padding: 0px;
+        .player-cards{
+            margin-bottom: -10px;
+            min-height: 19px;
+
+            .player-card{
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                
+                &:not(:last-child){
+                    margin-right: 3px;
+                }
+            }
+        }
+        
+        .hand > .horizontal.segments {
+            margin-bottom: 0px;
+            
+            & > .ui.segment{
+                padding: 0px;
+            }
         }
     }
 }

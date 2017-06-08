@@ -22,20 +22,23 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         self.players.push(player);
         
         if(self.players.length == 2){
-            self.activeNextPlayer();
+            self.phase = {text: "Iniciar partida", fn: self.startGame};
         }
     };
     
     self.playPhase = function(){
+        self.message = false;
+        
         self.phase.fn(self.phase.args)
-        .catch(function(error){
-            self.message = {type: "error", header: "Error", message: error};
+        .then(function(next_phase){
+            self.phase = next_phase;
+        })
+        .catch(function(error_message){
+            self.message = {type: "error", header: "Error", message: error_message};
         });
     };
     
     self.playCard = function(){
-        self.message = false;
-        
         var selected_card = _.filter(self.active_player.hand, "active");
 
         if(selected_card.length == 0){
@@ -48,27 +51,25 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         
         var player = self.active_player;
         return selected_card[0].play(self)
-        .then(function(){
+        .then(function(next_phase){
             player.removeCard(selected_card[0]);
+            return next_phase;
         });
         
     };
     
-    self.throwDice = function(amount){
-        self.message = false;
-        
+    self.throwDice = function(){
         var selected_dice = _.filter(self.dice, "active");
         
-        if(selected_dice.length != amount){
-            return $q.reject("Select "+amount+" dice to throw");
+        if(selected_dice.length != 2){
+            return $q.reject("Select 2 dice to throw");
         }
         
         _.forEach(_.filter(self.dice, "active"), function(die){
             die.number = _.random(1, 6);
         });
         
-        self.phase = {text: "Comprobar resultados", fn: self.checkHits};
-        return $q.resolve();
+        return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});
     };
     
     self.checkHits = function(){
@@ -108,13 +109,11 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
                     self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
                     self.board.removeCardInCell(card.row, card.column);
                 });
-                self.phase = {text: "Seleccionar "+self.active_player.player_cards.length+" carta(s) de número", fn: self.selectHitNumberCards, args: hit_cards};
-                return $q.resolve();
+                return $q.resolve({text: "Seleccionar "+self.active_player.player_cards.length+" carta(s) de número", fn: self.selectHitNumberCards, args: hit_cards});
             }
             else{
                 var amount = hit_cards.length - self.active_player.player_cards.length;
-                self.phase = {text: "Seleccionar "+amount+" carta(s) de jugador", fn: self.selectPlayerCards, args: amount};
-                return $q.resolve();
+                return $q.resolve({text: "Seleccionar "+amount+" carta(s) de jugador", fn: self.selectPlayerCards, args: amount});
             }
         }
     };
@@ -126,14 +125,11 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         }
         else{
             console.log(chains);
-            self.phase = {text: "Seleccionar figura", fn: self.selectFigure};
-            return $q.resolve();
+            return $q.resolve({text: "Seleccionar figura", fn: self.selectFigure});
         }
     };
     
     self.selectHitNumberCards = function(cards_hit){
-        self.message = false;
-        
         var amount = self.active_player.player_cards.length;
         
         var selected_cards = [];
@@ -157,8 +153,6 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     };
     
     self.selectPlayerCards = function(amount){
-        self.message = false;
-        
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
@@ -181,8 +175,6 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     };
     
     self.selectFigure = function(){
-        self.message = false;
-        
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
@@ -212,8 +204,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
-        self.phase = {text: "Jugar carta", fn: self.playCard};
-        return $q.resolve();
+        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
     };
     
     self.getChains = function(){
@@ -276,7 +267,14 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     self.init = function(){
         self.addPlayer("a");
         self.addPlayer("b");
-        self.phase = {text: "Jugar carta", fn: self.playCard};
+    };
+    
+    self.startGame = function(){
+        var starting_player = _.random(self.players.length - 1);
+        self.players[starting_player].active = true;
+        self.active_player = self.players[starting_player];
+        
+        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
     };
     
     self.activeNextPlayer = function(){
@@ -288,16 +286,9 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
             }
         }
         
-        if(angular.isUndefined(active_player_index)){
-            var starting_player = _.random(self.players.length - 1);
-            self.players[starting_player].active = true;
-            self.active_player = self.players[starting_player];
-        }
-        else{
-            var next_index = (active_player_index + 1) % (self.players.length);
-            self.players[next_index].active = true;
-            self.active_player = self.players[next_index];
-        }
+        var next_index = (active_player_index + 1) % (self.players.length);
+        self.players[next_index].active = true;
+        self.active_player = self.players[next_index];
     };
     
 }]);

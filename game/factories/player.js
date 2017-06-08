@@ -1,10 +1,11 @@
-app.factory("Player", function(PlayerCard){
+app.factory("Player", function(PlayerCard, Board){
     var Player = function(name, color){
         this.name = name;
         this.color = color;
         this.hand = [];
         this.active = false;
-        this.player_cards = new Array(4);
+        this.player_cards = new Array(6);
+        this.board = new Board(6,6);
         this.score = 0;
         
         for(var i = 0, len = this.player_cards.length; i < len; i++){
