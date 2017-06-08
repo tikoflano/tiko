@@ -18,7 +18,7 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, self.players.length ? "#03A9F4" : "red");
+        var player = new Player(name, self.players.length ? "#03A9F4" : "#FF5722");
         player.refillHand(self.deck);
         self.players.push(player);
         
