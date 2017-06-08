@@ -21,16 +21,20 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             this.cards.push(new NumberCard(i, i, i));
         }
         
+        this.shuffle();
+        
         //Action Cards        
         this.cards.unshift(new ActionCard("Finalizar turno", function(ctrl){
             ctrl.active_player.removeCard(this);
-            ctrl.endTurn();
-            return $q.resolve();
+            return ctrl.endTurn();
         }));
         
         this.cards.unshift(new ActionCard("Lanzar 3 dados", function(ctrl){
-            ctrl.phase = {text: "Lanzar 3 dados", fn: ctrl.throwDice, args: 3};
-            return $q.resolve();
+            _.forEach(ctrl.dice, function(die){
+                die.active = true;
+                die.number = _.random(1, 6);
+            });
+            return $q.resolve({text: "Comprobar resultados", fn: ctrl.checkHits});
         }));
              
         this.cards.unshift(new ActionCard("Intercambiar carta al rival", function(ctrl){
@@ -40,8 +44,8 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
                 });
             }            
             
-            ctrl.phase = {text: "Seleccionar una carta de la mano y una del rival", fn: function(){
-                ctrl.message = false;
+            reset();
+            return $q.resolve({text: "Seleccionar una carta de la mano y una del rival", fn: function(){
                 _.forEach(ctrl.players, function(player) {
                       player.active = false;
                 });
@@ -77,15 +81,11 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
                 target_cards[0].active = false;
                 active_player_cards[0].active = false;
                 
-                ctrl.phase = {text: "Lanzar 2 dados", fn: ctrl.throwDice, args: 2};
-                return $q.resolve();                
-            }};
-        
-            reset();
-            return $q.resolve();
+                return $q.resolve({text: "Lanzar 2 dados", fn: ctrl.throwDice});                
+            }});
         }));
         
-        this.shuffle();
+//        this.shuffle();
     };
     
     
