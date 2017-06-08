@@ -12,6 +12,8 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     self.players = [];    
     self.active_player = {};
     
+    self.log = function(x){console.log(x)};
+    
     self.addPlayer = function(name){
         if(self.players.length >= 2){
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
@@ -212,7 +214,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
         self.deactivateDice();
         self.resetDice();
         self.activeNextPlayer();
-        self.phase = {text: "Jugar carta", fn: self.playCard};
+        self.phase = {text: "Jugar carta de la mano", fn: self.playCard};
         return $q.resolve();
     };
     
@@ -276,7 +278,7 @@ app.controller("GameController", ["Player", "Deck", "Board", "$q", function(Play
     self.init = function(){
         self.addPlayer("a");
         self.addPlayer("b");
-        self.phase = {text: "Jugar carta", fn: self.playCard};
+        self.phase = {text: "Jugar carta de la mano", fn: self.playCard};
     };
     
     self.activeNextPlayer = function(){

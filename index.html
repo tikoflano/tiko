@@ -29,7 +29,7 @@
         <script src="game/factories/deck.js"></script>
         <script src="game/directives.js"></script>
     </head>
-    <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()">
+    <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="$event.key == ' ' && ctrl.playPhase()">
         <div class="ui container">
             <div class="ui celled grid">
                 <div id="actions" class="row">
@@ -39,9 +39,22 @@
                             <input type="text" ng-model="new_player_name" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
                             <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
                         </div>
-                        <button class="ui labeled right floated icon blue button" ng-click="ctrl.playPhase()">
-                            <i class="play icon"></i>{{ctrl.phase.text}}
-                        </button>
+                    </div>
+                </div>
+                <div id="messages" class="row">
+                    <div class="ui icon message">
+                        <i class="info circle icon"></i>
+                        <div class="content">
+                            <div class="header">Instrucciones</div>
+                            <p>{{ctrl.phase.text}}</p>
+                        </div>
+                    </div>
+                    <div class="ui icon message" ng-if="ctrl.message" ng-class="ctrl.message.type">
+                        <i class="warning circle icon"></i>
+                        <div class="content">
+                            <div class="header">{{ctrl.message.header}}</div>
+                            <p>{{ctrl.message.message}}</p>
+                        </div>
                     </div>
                 </div>
                 <div id="players" class="equal width row">
@@ -69,15 +82,6 @@
                             <div class="ui segment" ng-repeat="number_card in row" >
                                 <card ng-click="number_card.active = !number_card.active" card="number_card"></card>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="messages" class="row" ng-if="ctrl.message">
-                    <div class="ui icon message" ng-class="ctrl.message.type">
-                        <i class="warning circle icon"></i>
-                        <div class="content">
-                            <div class="header">{{ctrl.message.header}}</div>
-                            <p>{{ctrl.message.message}}</p>
                         </div>
                     </div>
                 </div>

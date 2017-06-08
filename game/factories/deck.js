@@ -40,7 +40,7 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
                 });
             }            
             
-            ctrl.phase = {text: "Seleccionar cartas", fn: function(){
+            ctrl.phase = {text: "Seleccionar una carta de la mano y una del rival", fn: function(){
                 ctrl.message = false;
                 _.forEach(ctrl.players, function(player) {
                       player.active = false;
