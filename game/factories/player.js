@@ -4,7 +4,7 @@ app.factory("Player", function(PlayerCard, Board){
         this.color = color;
         this.hand = [];
         this.active = false;
-        this.player_cards = new Array(4);
+        this.player_cards = new Array(6);
         this.board = new Board(6,6);
         
         for(var i = 0, len = this.player_cards.length; i < len; i++){

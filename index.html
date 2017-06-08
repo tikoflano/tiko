@@ -60,7 +60,11 @@
                 <div id="players" class="equal width row">
                     <div class="center aligned column" ng-repeat="player in ctrl.players" >
                         <div class="ui compact segment player" ng-class="{active: player.active}">
-                            <span class="name" ng-style="{background: player.color}">{{player.name}} {{player.player_cards.length}}</span>
+                            <span class="name" ng-style="{background: player.color}">{{player.name}}</span>
+                            <div class="player-cards">
+                                <span class="player-card" ng-repeat="player_card in player.player_cards" ng-style="{'background-color': player.color}"></span>
+                                <span ng-hide="player.player_cards.length">-</span>
+                            </div>
                             <div class="hand">
                                 <div class="ui horizontal segments" >
                                     <div class="ui segment" ng-repeat="number_card in player.hand" >
