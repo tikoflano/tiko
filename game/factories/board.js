@@ -1,6 +1,4 @@
-app.factory("Board", ["EmptyCard", "$q", function(EmptyCard, $q){
-    var self = this;
-    
+app.factory("Board", ["EmptyCard", function(EmptyCard){
     var Board = function(width, height){
         this.rows = new Array(height);
         
