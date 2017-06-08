@@ -28,7 +28,9 @@
         <script src="game/factories/board.js"></script>
         <script src="game/factories/player.js"></script>
         <script src="game/factories/deck.js"></script>
-        <script src="game/directives.js"></script>
+        <script src="game/directives/card.js"></script>
+        <script src="game/directives/figure.js"></script>
+        <script src="game/directives/playerBoard.js"></script>
     </head>
     <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="$event.key == ' ' && ctrl.playPhase()">
         <div class="ui container">
@@ -62,7 +64,7 @@
                 <div id="players" class="equal width row">
                     <div class="center aligned column" ng-repeat="player in ctrl.players" >
                         <div class="ui compact segment player" ng-class="{active: player.active}">
-                            <span class="name" ng-click="player.showBoard()" ng-style="{background: player.color}">{{player.name}}</span>
+                            <span class="name" ng-click="ctrl.showBoard(player)" ng-style="{background: player.color}">{{player.name}}</span>
                             <div class="player-cards">
                                 <span class="player-card" ng-repeat="player_card in player.player_cards" ng-style="{'background-color': player.color}"></span>
                                 <span ng-hide="player.player_cards.length">-</span>
@@ -74,9 +76,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <player-board player="player"></player-board>
                         </div>
                     </div>
+                    <player-board></player-board>
                 </div>
                 <div id="dice" class="centered row">
                     <div class="ui horizontal segments">

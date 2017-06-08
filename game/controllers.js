@@ -1,4 +1,4 @@
-app.controller("GameController", function(Config, Player, Deck, Board, $q) {
+app.controller("GameController", function($scope, $q, Config, Player, Deck, Board, PlayerCard) {
     var self = this;
     
     self.debug = Config.debug;
@@ -199,6 +199,10 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         return self.checkHits();
     };
     
+    self.showBoard = function(player){
+        $scope.$broadcast("show-board", player);
+    };
+    
     self.selectFigure = function(){
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
@@ -227,8 +231,34 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
             self.board.removeCardInCell(card.row, card.column);
         });
         
-        self.active_player.addFigure(selected_cards);
-
+        $scope.$broadcast("show-board", self.active_player, selected_cards);
+        return $q.resolve({text: "Agregar figura", fn: self.addFigure, args: selected_cards});
+    };
+    
+    self.addFigure = function(figure){
+        var selected_cards = [];
+        for(var i = 0, len = self.active_player.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.active_player.board.rows[i].length; j < len2; j++){
+                if(self.active_player.board.rows[i][j].active && self.board.rows[i][j].type == "empty"){
+                    selected_cards.push({row: i, column: j});
+                }
+            } 
+        }
+        
+        if(selected_cards.length != figure.length){
+            return $q.reject("Select "+figure.length+" spaces forming the shape");
+        }
+        
+        var chains = self.getChains(selected_cards);
+        if(chains.length != 1){
+            return $q.reject("Select "+figure.length+" spaces forming the shape");
+        }
+        
+        for(var i = 0, len = selected_cards.length; i < len; i++){
+            self.active_player.board.rows[selected_cards[i].row][selected_cards[i].column] = new PlayerCard(self.active_player);
+        }
+        
+        $scope.$broadcast("hide-board");
         return self.endTurn();
     };
     
