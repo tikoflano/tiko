@@ -28,9 +28,6 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
         }));
         
         this.cards.unshift(new ActionCard("Lanzar 3 dados", function(ctrl){
-            if(ctrl.board.isEmpty()){
-                return $q.reject("No se puede usar esta carta con el tablero vacío");
-            }
             _.forEach(ctrl.dice, function(die){
                 die.active = true;
                 die.number = _.random(1, 6);
