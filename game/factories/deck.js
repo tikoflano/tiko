@@ -27,8 +27,6 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             return ctrl.endTurn();
         }));
         
-        this.shuffle();
-        
         this.cards.unshift(new ActionCard("Lanzar 3 dados", function(ctrl){
             _.forEach(ctrl.dice, function(die){
                 die.active = true;
@@ -85,7 +83,7 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             }});
         }));
         
-//        this.shuffle();
+        this.shuffle();
     };
     
     
