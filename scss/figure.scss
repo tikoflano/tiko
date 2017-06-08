@@ -1,18 +1,22 @@
 $size: 20px;
 
 .figure{
-    .row{
-        margin-bottom: -4px;
-    }
-    .cell{
-        display: inline-block;
-        background: black;
-        width: $size;
-        height: $size;
-        border: 1px solid white;
-        
-        &.empty{
-            background: white;
+    .ui.segments{
+        border: none;
+        box-shadow: none;
+        margin: 0px;
+    
+        .ui.segment{
+            min-width: $size;
+            min-height: $size;
+            background: black;
+            border: 1px solid white;
+            padding: 0px;
+            
+            &.empty{
+                background: white;
+            }
+            
         }
     }
 }

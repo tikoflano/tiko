@@ -40,6 +40,7 @@
                             <input type="text" ng-model="new_player_name" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
                             <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
                         </div>
+                        <input type="number" ng-model="ctrl.number" ng-if="ctrl.debug">
                     </div>
                 </div>
                 <div id="messages" class="row">

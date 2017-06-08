@@ -1,6 +1,6 @@
 <div class="figure">
-    <div class="row" ng-repeat="row in minfig track by $index">
-        <span class="cell" ng-repeat="cell in row track by $index" ng-class="{empty: !cell}"></span>
+    <div class="ui horizontal segments" ng-repeat="row in minfig track by $index">
+        <span class="ui segment" ng-repeat="cell in row track by $index" ng-class="{empty: !cell}"></span>
     </div>
 </div>
 

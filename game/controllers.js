@@ -1,6 +1,7 @@
 app.controller("GameController", function(Config, Player, Deck, Board, $q) {
     var self = this;
     
+    self.debug = Config.debug;
     self.phase = {};
     self.deck = new Deck();
     self.board = new Board(Config.board.width, Config.board.height);
@@ -66,7 +67,7 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         }
         
         _.forEach(_.filter(self.dice, "active"), function(die){
-            die.number = _.random(1, 6);
+            die.number = self.debug ? self.number :_.random(1, 6);
         });
         
         return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});
@@ -83,7 +84,7 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
                 }
                 if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
                     _.forEach(_.filter(self.dice, "active"), function(die){
-                        if(angular.isDefined(self.board.rows[i][j].numbers[die.color]) && die.number == self.board.rows[i][j].numbers[die.color]){
+                        if(self.board.rows[i][j].numbers[die.color] && die.number == self.board.rows[i][j].numbers[die.color]){
                             hit_cards.push({row: i, column: j});
                             return false;
                         }
@@ -103,7 +104,6 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
             return self.checkChains();
         }
         else if(hit_cards.length > self.active_player.player_cards.length){
-            
             if(hit_cards.length > (self.active_player.player_cards.length + player_cards.length)){
                 _.forEach(player_cards, function(card){
                     self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
@@ -119,7 +119,16 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
     };
     
     self.checkChains = function(){
-        var chains = self.getChains();
+        var cells = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    cells.push({row: i, column: j});
+                }
+            }
+        }
+        
+        var chains = self.getChains(cells);
         if(!chains.length){
             return self.endTurn();
         }
@@ -187,6 +196,15 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
             return $q.reject("Select "+Config.figure.size+" contiguous cards of your color");
         }
         
+        var chains = self.getChains(selected_cards);
+        if(chains.length == 0){
+            return $q.reject("Select one group of contiguous "+Config.figure.size+" cards of your color");
+        }
+        
+        if(chains.length > 1){
+            return $q.reject("Select just one group of contiguous "+Config.figure.size+" cards of your color");
+        }
+        
         _.forEach(selected_cards, function(card){
             self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
             self.board.removeCardInCell(card.row, card.column);
@@ -206,23 +224,14 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
         return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
     };
     
-    self.getChains = function(){
-        var filtered = [];
-        for(var i = 0, len = self.board.rows.length; i < len; i++){
-            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
-                    filtered.push({row: i, column: j});
-                }
-            }
-        }
-
+    self.getChains = function(cells){
         var groups = [];
         var checked = [];
 
-        for(var i = 0, len = filtered.length; i < len; i++){
-            if(!_.find(checked, filtered[i])){
-                var group = [filtered[i]];
-                findNeighbors(filtered[i], group, checked);
+        for(var i = 0, len = cells.length; i < len; i++){
+            if(!_.find(checked, cells[i])){
+                var group = [cells[i]];
+                findNeighbors(cells[i], group, checked);
                 if(group.length >= Config.figure.size){
                     groups.push(group);
                 }
@@ -240,7 +249,7 @@ app.controller("GameController", function(Config, Player, Deck, Board, $q) {
             ];
 
             for(var i = 0, len = neighbors.length; i < len; i++){
-                var neighbor = _.find(filtered, neighbors[i]);
+                var neighbor = _.find(cells, neighbors[i]);
                 if(neighbor && !_.find(checked, neighbors[i])){
                     group.push(neighbor);
                     findNeighbors(neighbor, group, checked);
