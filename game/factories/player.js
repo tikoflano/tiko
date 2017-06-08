@@ -1,11 +1,11 @@
-app.factory("Player", function(PlayerCard, Board){
+app.factory("Player", function(Config, PlayerCard, Board){
     var Player = function(name, color){
         this.name = name;
         this.color = color;
         this.hand = [];
         this.active = false;
-        this.player_cards = new Array(6);
-        this.board = new Board(6,6);
+        this.player_cards = new Array(Config.player.player_cards);
+        this.board = new Board(Config.player.board.width, Config.player.board.height);
         this.score = 0;
         
         for(var i = 0, len = this.player_cards.length; i < len; i++){
@@ -14,7 +14,7 @@ app.factory("Player", function(PlayerCard, Board){
     };
     
     Player.prototype.refillHand = function(deck){
-        while(this.hand.length < 3){
+        while(this.hand.length < Config.player.hand_size){
             this.hand.push(deck.cards.shift());
         }
         return this;
