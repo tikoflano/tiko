@@ -52,7 +52,18 @@ app.factory("Board", ["EmptyCard", function(EmptyCard){
     
     Board.prototype.removeCardInCell = function(row, column){
         this.rows[row][column] = new EmptyCard();
-    }; 
+    };
+    
+    Board.prototype.removeRow = function(index){
+        var width = this.rows[index].length;
+        this.rows.splice(index, 1);
+        
+        this.rows.unshift(new Array(width));
+        for(var i = 0; i < width; i++){
+            this.rows[0][i] = new EmptyCard();
+        }
+        
+    };
     
     return Board;
 }]);

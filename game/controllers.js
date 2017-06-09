@@ -13,6 +13,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     self.players = [];    
     self.active_player = {};
     
+    self.showBoard = function(player){
+        $scope.$broadcast("show-board", player);
+    };
+    
     self.init = function(){
         self.addPlayer("John Doe");
         self.addPlayer("Robin Hood");
@@ -192,15 +196,12 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         }
         
         _.forEach(selected_cards, function(card){
+            self.board.rows[card.row][card.column].active = false;
             self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
             self.board.removeCardInCell(card.row, card.column);
         });
         
         return self.checkHits();
-    };
-    
-    self.showBoard = function(player){
-        $scope.$broadcast("show-board", player);
     };
     
     self.selectFigure = function(){
@@ -264,16 +265,13 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
            return $q.reject("The figure must rest over the bottom edge or a colored block"); 
         }
         
-        var max_row = _.maxBy(selected_cards, "row").row;
-        var min_col = _.minBy(selected_cards, "column").column;
-        var max_col = _.maxBy(selected_cards, "column").column;
         var opening = true;
-        for(var i = 0; i <= max_row; i++){
-            for(var j = min_col; j <= max_col; j++){
-                if(self.active_player.board.rows[i][j].type != "empty"){
+        for(var i = 0, len = selected_cards.length; i < len; i++){
+            for(var a = 0; a <= selected_cards[i].row; a++){
+                if(self.active_player.board.rows[a][selected_cards[i].column].type != "empty"){
                     opening = false;
                 }
-            } 
+            }
         }
         if(!opening){
            return $q.reject("There must be an opening wide enough to let the figure go down"); 
@@ -312,6 +310,33 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         }
         
         $scope.$broadcast("hide-board");
+        return self.checkCompleteLines();
+    };
+    
+    self.checkCompleteLines = function(){
+        var completed_lines = [];
+        
+        for(var i = 0, len = self.active_player.board.rows.length; i < len; i++){
+            var completed_line = true;
+            for(var j = 0, len2 = self.active_player.board.rows[i].length; j < len2; j++){
+                if(self.active_player.board.rows[i][j].type == "empty"){
+                    completed_line = false;
+                    break;
+                }
+            } 
+            if(completed_line){
+                completed_lines.push(i);
+            }
+        }
+        
+        if(completed_lines.length){      
+            self.active_player.score += (2 * completed_lines.length) - 1;
+
+            for(var i = 0, len = completed_lines.length; i < len; i++){
+                self.active_player.board.removeRow(completed_lines[i]);
+            }
+        }
+        
         return self.endTurn();
     };
     
