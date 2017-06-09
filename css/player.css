@@ -6,13 +6,15 @@
   opacity: 0.5; }
   #players .player.active {
     opacity: 1; }
-  #players .player .name {
-    display: block;
-    background: #FFC107;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 5px;
-    border-radius: 5px; }
+  #players .player > .ui.horizontal.segments {
+    margin: 0px 0px 5px 0px; }
+    #players .player > .ui.horizontal.segments .ui.segment {
+      padding: 2px 0px; }
+      #players .player > .ui.horizontal.segments .ui.segment .circular.label {
+        margin-top: 2px; }
+      #players .player > .ui.horizontal.segments .ui.segment.name {
+        margin-top: 5px;
+        font-weight: bold; }
   #players .player .player-cards {
     margin-bottom: -10px;
     min-height: 19px; }
