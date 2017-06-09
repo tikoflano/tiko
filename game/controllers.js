@@ -145,7 +145,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             }
         }
         
-        var chains = self.getChains(cells);
+        var chains = _.filter(self.getChains(cells), function(group){ return group.length >= Config.figure.size; });
         if(!chains.length){
             return self.endTurn();
         }
@@ -213,17 +213,13 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             } 
         }
         
-        if(selected_cards.length != Config.figure.size){
-            return $q.reject("Select "+Config.figure.size+" contiguous cards of your color");
-        }
-        
-        var chains = self.getChains(selected_cards);
+        var chains = _.filter(self.getChains(selected_cards), function(group){ return group.length == Config.figure.size; });
         if(chains.length == 0){
-            return $q.reject("Select one group of contiguous "+Config.figure.size+" cards of your color");
+            return $q.reject("Select one group of "+Config.figure.size+" contiguous cards of your color");
         }
         
         if(chains.length > 1){
-            return $q.reject("Select just one group of contiguous "+Config.figure.size+" cards of your color");
+            return $q.reject("Select just one group of "+Config.figure.size+" contiguous cards of your color");
         }
         
         _.forEach(selected_cards, function(card){
@@ -257,20 +253,62 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             return $q.reject("Select "+figure.length+" spaces forming the shape");
         }
         
-        var valid = false;
+        var bottom = false;
         for(var i = 0, len = selected_cards.length; i < len; i++){
             if((selected_cards[i].row + 1) ==  self.active_player.board.rows.length ||
                 self.active_player.board.rows[selected_cards[i].row + 1][selected_cards[i].column].type == "player"){
-                valid = true;
+                bottom = true;
             }
+        }        
+        if(!bottom){
+           return $q.reject("The figure must rest over the bottom edge or a colored block"); 
         }
         
-        if(!valid){
-           return $q.reject("The figure must rest over the bottom edge or a color block"); 
+        var max_row = _.maxBy(selected_cards, "row").row;
+        var min_col = _.minBy(selected_cards, "column").column;
+        var max_col = _.maxBy(selected_cards, "column").column;
+        var opening = true;
+        for(var i = 0; i <= max_row; i++){
+            for(var j = min_col; j <= max_col; j++){
+                if(self.active_player.board.rows[i][j].type != "empty"){
+                    opening = false;
+                }
+            } 
+        }
+        if(!opening){
+           return $q.reject("There must be an opening wide enough to let the figure go down"); 
         }
         
         for(var i = 0, len = selected_cards.length; i < len; i++){
             self.active_player.board.rows[selected_cards[i].row][selected_cards[i].column] = new PlayerCard(self.active_player);
+        }
+        
+        var occupied_cells = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type != "empty"){
+                    occupied_cells.push({row: i, column: j});
+                }
+            } 
+        }
+        
+        var chains = self.getChains(occupied_cells);
+        
+        for(var i = 0, len = chains.length; i < len; i++){
+            var clear_chain = true;
+            for(var j = 0, len2 = chains[i].length; j < len2; j++){
+                if(self.board.rows[chains[i][j].row][chains[i][j].column].type == "number"){
+                    clear_chain = false;
+                    break;
+                }
+            }
+            
+            if(clear_chain){
+                for(var j = 0, len2 = chains[i].length; j < len2; j++){
+                    self.board.rows[chains[i][j].row][chains[i][j].column].player.player_cards.push(self.board.rows[chains[i][j].row][chains[i][j].column]);
+                    self.board.removeCardInCell(chains[i][j].row, chains[i][j].column);
+                }
+            }
         }
         
         $scope.$broadcast("hide-board");
@@ -293,9 +331,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             if(!_.find(checked, cells[i])){
                 var group = [cells[i]];
                 findNeighbors(cells[i], group, checked);
-                if(group.length >= Config.figure.size){
-                    groups.push(group);
-                }
+                groups.push(group);
             }
         }
 
