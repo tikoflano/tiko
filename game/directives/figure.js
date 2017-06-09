@@ -1,4 +1,4 @@
-app.directive("figure", function () {
+app.directive("figure", function (Utils) {
     return {
         restrict: "E",
         scope:{
@@ -7,12 +7,8 @@ app.directive("figure", function () {
         link: function($scope){
             $scope.$watch("figure", function(newValue){
                 if(!newValue || !newValue.length){return;}
-                                
-                var min_row = _.minBy($scope.figure, "row").row;
-                var min_column = _.minBy($scope.figure, "column").column;
-                var min_figure = _.map($scope.figure, function(coords){
-                    return {row: coords.row - min_row, column: coords.column - min_column}
-                });
+                
+                var min_figure = Utils.minFigure($scope.figure);
 
                 var width = _.maxBy(min_figure, "column").column + 1;
                 var height = _.maxBy(min_figure, "row").row + 1;

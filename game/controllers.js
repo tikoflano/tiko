@@ -1,4 +1,4 @@
-app.controller("GameController", function($scope, $q, Config, Player, Deck, Board, PlayerCard) {
+app.controller("GameController", function($scope, $q, Config, Utils, Player, Deck, Board, PlayerCard) {
     var self = this;
     
     self.debug = Config.debug;
@@ -145,7 +145,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             }
         }
         
-        var chains = _.filter(self.getChains(cells), function(group){ return group.length >= Config.figure.size; });
+        var chains = _.filter(Utils.getChains(cells), function(group){ return group.length >= Config.figure.size; });
         if(!chains.length){
             return self.endTurn();
         }
@@ -213,7 +213,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             } 
         }
         
-        var chains = _.filter(self.getChains(selected_cards), function(group){ return group.length == Config.figure.size; });
+        var chains = _.filter(Utils.getChains(selected_cards), function(group){ return group.length == Config.figure.size; });
         if(chains.length == 0){
             return $q.reject("Select one group of "+Config.figure.size+" contiguous cards of your color");
         }
@@ -246,8 +246,8 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             return $q.reject("Select "+figure.length+" spaces forming the shape");
         }
         
-        var min_figure = minFigure(figure);
-        var min_selected_cards = minFigure(selected_cards);
+        var min_figure = Utils.minFigure(figure);
+        var min_selected_cards = Utils.minFigure(selected_cards);
         
         if(!_.isEqual(min_figure, min_selected_cards)){
             return $q.reject("Select "+figure.length+" spaces forming the shape");
@@ -292,7 +292,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
             } 
         }
         
-        var chains = self.getChains(occupied_cells);
+        var chains = Utils.getChains(occupied_cells);
         
         for(var i = 0, len = chains.length; i < len; i++){
             var clear_chain = true;
@@ -315,76 +315,15 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         return self.endTurn();
     };
     
-    function minFigure(figure){
-        var min_row = _.minBy(figure, "row").row;
-        var min_column = _.minBy(figure, "column").column;
-        return  _.map(figure, function(coords){
-            return {row: coords.row - min_row, column: coords.column - min_column}
-        });
-    };
-    
-    self.getChains = function(cells){
-        var groups = [];
-        var checked = [];
-
-        for(var i = 0, len = cells.length; i < len; i++){
-            if(!_.find(checked, cells[i])){
-                var group = [cells[i]];
-                findNeighbors(cells[i], group, checked);
-                groups.push(group);
-            }
-        }
-
-        function findNeighbors(element, group, checked){
-            checked.push(element);
-
-            var neighbors = [
-                {row: element.row - 1, column: element.column},
-                {row: element.row, column: element.column + 1},
-                {row: element.row + 1, column: element.column},
-                {row: element.row, column: element.column - 1},
-            ];
-
-            for(var i = 0, len = neighbors.length; i < len; i++){
-                var neighbor = _.find(cells, neighbors[i]);
-                if(neighbor && !_.find(checked, neighbors[i])){
-                    group.push(neighbor);
-                    findNeighbors(neighbor, group, checked);
-                }
-            }	
-        }
-        
-        return groups;
-    };
-    
     self.endTurn = function(){
         self.active_player.deactivateHand().refillHand(self.deck);
         self.board.deactivate();
-        self.deactivateDice();
-        self.resetDice();
-        self.activeNextPlayer();
         
-        if(!self.board.isFull() || self.active_player.hasActionCard()){
-            return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
-        }
-        else{
-            return $q.resolve({text: "Lanzar 2 dados", fn: self.throwDice});
-        }
-    };
-    
-    self.resetDice = function(){
         _.forEach(self.dice, function(die){
             die.number = null;
-        });
-    };
-    
-    self.deactivateDice = function(){
-        _.forEach(self.dice, function(die){
             die.active = false;
         });
-    };
-    
-    self.activeNextPlayer = function(){
+        
         var active_player_index;
         for(var i = 0, len = self.players.length; i < len; i++){
             if(self.players[i].active){
@@ -395,7 +334,13 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         
         var next_index = (active_player_index + 1) % (self.players.length);
         self.players[next_index].active = true;
-        self.active_player = self.players[next_index];
-    };
-    
+        self.active_player = self.players[next_index];;
+        
+        if(!self.board.isFull() || self.active_player.hasActionCard()){
+            return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
+        }
+        else{
+            return $q.resolve({text: "Lanzar 2 dados", fn: self.throwDice});
+        }
+    };    
 });
