@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css"/>
-        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/actions.css"/>
         <link rel="stylesheet" type="text/css" href="css/card.css"/>
         <link rel="stylesheet" type="text/css" href="css/die.css"/>
         <link rel="stylesheet" type="text/css" href="css/dice.css"/>
@@ -36,12 +36,12 @@
     <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">
         <div class="ui container">
             <div class="ui grid">
-                <div id="actions" class="row" ng-if="ctrl.players.length < ctrl.config.player.amount">
+                <div id="actions" class="center aligned row" ng-if="ctrl.players.length < ctrl.config.player.amount">
                     <div class="column">
-                        <input type="color" ng-model="new_player_color">
+                        <input type="color" ng-model="ctrl.new_player.color">
                         <div class="ui action input">
-                            <input type="text" ng-model="new_player_name" placeholder="Nombre">
-                            <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''">Agregar jugador</button>
+                            <input type="text" ng-model="ctrl.new_player.name" placeholder="Nombre">
+                            <button class="ui blue button" ng-click="ctrl.addPlayer()">Agregar jugador</button>
                         </div>
                         <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                     </div>

@@ -4,6 +4,8 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     self.config = Config;
     self.message = false;
     self.phase = false;
+    
+    self.new_player = {name: "", color: "#f0f0f0"};
     self.deck = new Deck();
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
@@ -19,8 +21,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     };
     
     self.init = function(){
-        self.addPlayer("John Doe", "#FF5722");
-        self.addPlayer("Robin Hood", "#03A9F4");
+        self.new_player = {name: "John Doe", color: "#FF5722"};
+        self.addPlayer();
+        self.new_player = {name: "Robin Hood", color: "#03A9F4"};
+        self.addPlayer();
     };
     
     self.playPhase = function(){
@@ -35,9 +39,9 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         });
     };
     
-    self.addPlayer = function(name, color){
+    self.addPlayer = function(){
         self.message = false;
-        if(!name){
+        if(!self.new_player.name){
             self.message = {type: "error", header: "Error", message: "Enter player's name"};
             return false;
         }
@@ -46,13 +50,15 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, color);
+        var player = new Player(self.new_player.name, self.new_player.color);
         player.refillHand(self.deck);
         self.players.push(player);
         
         if(self.players.length == Config.player.amount){
             self.phase = {text: "Iniciar partida", fn: self.startGame};
         }
+        
+        self.new_player = {};
     };
     
     self.startGame = function(){
