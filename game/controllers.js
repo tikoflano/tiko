@@ -227,6 +227,7 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         }
         
         _.forEach(selected_cards, function(card){
+            self.board.rows[card.row][card.column].active = false;
             self.active_player.player_cards.push(self.board.rows[card.row][card.column]);
             self.board.removeCardInCell(card.row, card.column);
         });
@@ -254,6 +255,18 @@ app.controller("GameController", function($scope, $q, Config, Player, Deck, Boar
         
         if(!_.isEqual(min_figure, min_selected_cards)){
             return $q.reject("Select "+figure.length+" spaces forming the shape");
+        }
+        
+        var valid = false;
+        for(var i = 0, len = selected_cards.length; i < len; i++){
+            if((selected_cards[i].row + 1) ==  self.active_player.board.rows.length ||
+                self.active_player.board.rows[selected_cards[i].row + 1][selected_cards[i].column].type == "player"){
+                valid = true;
+            }
+        }
+        
+        if(!valid){
+           return $q.reject("The figure must rest over the bottom edge or a color block"); 
         }
         
         for(var i = 0, len = selected_cards.length; i < len; i++){

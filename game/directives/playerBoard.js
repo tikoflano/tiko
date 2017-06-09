@@ -1,8 +1,8 @@
-app.directive("playerBoard", function ($q, $timeout) {
+app.directive("playerBoard", function ($timeout) {
     return {
         restrict: "E",
         scope: true,
-        link: function($scope, $element, attrs, controller){
+        link: function($scope, $element){
             var $modal = $element.find(".modal");
             
             $scope.$on("show-board", function(event, player, figure){
