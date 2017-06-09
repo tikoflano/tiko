@@ -15,6 +15,7 @@
         <link rel="stylesheet" type="text/css" href="css/player.css"/>
         <link rel="stylesheet" type="text/css" href="css/messages.css"/>
         <link rel="stylesheet" type="text/css" href="css/figure.css"/>
+        <link rel="stylesheet" type="text/css" href="css/player-board.css"/>
         
         <script src="jquery/jquery-3.2.1.min.js"></script>
         <script src="semantic/semantic.min.js"></script>
@@ -32,21 +33,21 @@
         <script src="game/directives/figure.js"></script>
         <script src="game/directives/playerBoard.js"></script>
     </head>
-    <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="$event.key == ' ' && ctrl.playPhase()">
+    <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">
         <div class="ui container">
             <div class="ui grid">
-                <div id="actions" class="row">
+                <div id="actions" class="row" ng-if="ctrl.players.length < ctrl.config.player.amount">
                     <div class="column">
-                        <input type="color" ng-model="new_player_color" ng-disabled="ctrl.players.length >= 2">
+                        <input type="color" ng-model="new_player_color">
                         <div class="ui action input">
-                            <input type="text" ng-model="new_player_name" placeholder="Nombre" ng-disabled="ctrl.players.length >= 2">
-                            <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''" ng-disabled="ctrl.players.length >= 2">Agregar jugador</button>
+                            <input type="text" ng-model="new_player_name" placeholder="Nombre">
+                            <button class="ui blue button" ng-click="ctrl.addPlayer(new_player_name, new_player_color);new_player_name = ''">Agregar jugador</button>
                         </div>
-                        <input type="number" ng-model="ctrl.number" ng-if="ctrl.debug">
+                        <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                     </div>
                 </div>
                 <div id="messages" class="row">
-                    <div class="ui icon message">
+                    <div class="ui icon message" ng-if="ctrl.phase">
                         <i class="info circle icon"></i>
                         <div class="content">
                             <div class="header">Fase actual</div>

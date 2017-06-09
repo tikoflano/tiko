@@ -1,8 +1,9 @@
 app.controller("GameController", function($scope, $q, Config, Utils, Player, Deck, Board, PlayerCard) {
     var self = this;
     
-    self.debug = Config.debug;
-    self.phase = {};
+    self.config = Config;
+    self.message = false;
+    self.phase = false;
     self.deck = new Deck();
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
@@ -18,8 +19,8 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     };
     
     self.init = function(){
-        self.addPlayer("John Doe");
-        self.addPlayer("Robin Hood");
+        self.addPlayer("John Doe", "#FF5722");
+        self.addPlayer("Robin Hood", "#03A9F4");
     };
     
     self.playPhase = function(){
@@ -34,16 +35,22 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         });
     };
     
-    self.addPlayer = function(name){
-        if(self.players.length >= 2){
+    self.addPlayer = function(name, color){
+        self.message = false;
+        if(!name){
+            self.message = {type: "error", header: "Error", message: "Enter player's name"};
+            return false;
+        }
+        
+        if(self.players.length >= Config.player.amount){
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, self.players.length ? "#03A9F4" : "#FF5722");
+        var player = new Player(name, color);
         player.refillHand(self.deck);
         self.players.push(player);
         
-        if(self.players.length == 2){
+        if(self.players.length == Config.player.amount){
             self.phase = {text: "Iniciar partida", fn: self.startGame};
         }
     };
@@ -88,7 +95,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         }
         
         _.forEach(_.filter(self.dice, "active"), function(die){
-            die.number = self.debug ? self.number :_.random(1, 6);
+            die.number = self.config.debug ? self.number :_.random(1, 6);
         });
         
         return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});

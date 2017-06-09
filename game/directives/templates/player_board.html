@@ -1,7 +1,5 @@
-<div class="ui modal">
-    <div class="header">
-        Player Board - {{player.name}}
-    </div>
+<div class="ui player-board modal">
+    <div class="header" ng-style="{'background-color': player.color}">{{player.name}}</div>
     <div class="content">
         <div class="ui grid">
             <div id="messages" class="row">
@@ -37,6 +35,6 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui positive button" ng-click="hideBoard()">Cerrar</div>
+        <div class="ui black button" ng-click="hideBoard()">Cerrar</div>
     </div>
 </div>
