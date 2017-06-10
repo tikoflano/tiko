@@ -14,9 +14,11 @@ card {
       background: rgba(255, 255, 0, 0.83);
       border-color: rgba(255, 255, 0, 0.83); }
   card .number.ui.segments {
-    border: none; }
+    border: none;
+    box-shadow: none; }
     card .number.ui.segments > .ui.segments {
-      border: none; }
+      border: none;
+      box-shadow: none; }
   card .player.ui.segment {
     height: 100%;
     margin: 0px; }

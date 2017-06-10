@@ -35,7 +35,9 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
             self.phase = next_phase;
         })
         .catch(function(error_message){
-            self.message = {type: "error", header: "Error", message: error_message};
+            if(error_message){
+                self.message = {type: "error", header: "", message: error_message};
+            }
         });
     };
     
@@ -88,7 +90,13 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         return selected_card[0].play(self)
         .then(function(next_phase){
             player.removeCard(selected_card[0]);
-            return next_phase;
+    
+            if(player.finished){
+                return self.endTurn();
+            }
+            else{
+                return next_phase;
+            }
         });
         
     };
@@ -242,11 +250,32 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
             self.board.removeCardInCell(card.row, card.column);
         });
         
+        //Check if the figure can be added
+        var min_figure = Utils.minFigure(selected_cards);
+        var can_be_added = false;
+        for(var i = 0, len = self.active_player.board.rows[0].length; i < len; i++){
+            var fits = true;
+            for(var j = 0, len2 = min_figure.length; j < len2; j++){
+                if((min_figure[j].row + i) >= self.active_player.board.rows.length || self.active_player.board.rows[min_figure[j].row][min_figure[j].column + i].type != "empty"){
+                    fits = false;
+                    break;
+                }
+            }
+            if(fits){
+                can_be_added = true;
+                break;
+            }
+        }
+        if(!can_be_added){
+            self.active_player.finished = true;
+            return self.endTurn();
+        }
+        
         $scope.$broadcast("show-board", self.active_player, selected_cards);
         return $q.resolve({text: "Agregar figura", fn: self.addFigure, args: selected_cards});
     };
     
-    self.addFigure = function(figure){
+    self.addFigure = function(figure){     
         var selected_cards = [];
         for(var i = 0, len = self.active_player.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.active_player.board.rows[i].length; j < len2; j++){
@@ -354,6 +383,24 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     };
     
     self.endTurn = function(){
+        var playing_players = _.filter(self.players, {finished: false});
+        var finished_players = _.filter(self.players, {finished: true});
+        if(playing_players.length == 0){
+            return self.endGame();
+        }
+        else if(playing_players.length == 1){
+            var max_score = 0;
+            for(var i = 0, len = finished_players.length; i < len; i++){
+                max_score = Math.max(max_score, finished_players[i].score);
+            }
+            
+            if(playing_players[0].score > max_score)
+            return self.endGame();
+        }
+        else if(self.active_player.score >= self.config.game.target_score){
+            return self.endGame();
+        }
+        
         self.active_player.deactivateHand().refillHand(self.deck);
         self.board.deactivate();
         
@@ -372,7 +419,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         
         var next_index = (active_player_index + 1) % (self.players.length);
         self.players[next_index].active = true;
-        self.active_player = self.players[next_index];;
+        self.active_player = self.players[next_index];
         
         if(!self.board.isFull() || self.active_player.hasActionCard()){
             return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
@@ -380,5 +427,13 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         else{
             return $q.resolve({text: "Lanzar 2 dados", fn: self.throwDice});
         }
-    };    
+    }; 
+    
+    self.endGame = function(){
+        var winning_score = _.maxBy(self.players, "score").score;
+        var winners = _.map(_.filter(self.players, {score: winning_score}), "name");
+        self.message = {type: "positive", header: "Game Over", message: (winners.length == 1 ? "Winner: " + winners[0] : "Winners: " + _.join(winners, ", "))+" with "+winning_score+" points"};
+        self.phase = false;
+        return $q.reject();
+    };
 });

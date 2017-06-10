@@ -7,6 +7,7 @@ app.factory("Player", function(Config, PlayerCard, Board){
         this.player_cards = new Array(Config.player.player_cards);
         this.board = new Board(Config.player.board.width, Config.player.board.height);
         this.score = 0;
+        this.finished = false;
         
         for(var i = 0, len = this.player_cards.length; i < len; i++){
             this.player_cards[i] = new PlayerCard(this);

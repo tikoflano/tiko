@@ -43,7 +43,6 @@
                             <input type="text" ng-model="ctrl.new_player.name" placeholder="Nombre">
                             <button class="ui blue button" ng-click="ctrl.addPlayer()">Agregar jugador</button>
                         </div>
-                        <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                     </div>
                 </div>
                 <div id="messages" class="row">
@@ -64,10 +63,10 @@
                 </div>
                 <div id="players" class="equal width row">
                     <div class="center aligned column" ng-repeat="player in ctrl.players" >
-                        <div class="ui compact segment player" ng-class="{active: player.active}">                            
+                        <div class="ui compact segment player" ng-class="{active: player.active, finished: player.finished}">                            
                             <div class="ui horizontal segments" ng-style="{background: player.color}">
                                 <div class="ui compact segment">
-                                    <span class="ui black circular label">{{player.score}}</span>
+                                    <span class="ui circular label" ng-class="player.finished ? 'red' : 'black'">{{player.score}}</span>
                                 </div>
                                 <div class="ui name compact segment">{{player.name}}</div>
                                 <div class="ui compact segment">
@@ -93,6 +92,7 @@
                     <div class="ui horizontal segments">
                         <span class="ui die compact segment" ng-repeat="die in ctrl.dice" ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" ng-click="die.active = !die.active"></span>
                     </div>
+                    <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                 </div>
                 <div class="board centered row">
                     <div class="ui compact segments">

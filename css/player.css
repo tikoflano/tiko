@@ -6,6 +6,8 @@
   opacity: 0.5; }
   #players .player.active {
     opacity: 1; }
+  #players .player.finished {
+    border: 1px solid red; }
   #players .player > .ui.horizontal.segments {
     margin: 0px 0px 5px 0px; }
     #players .player > .ui.horizontal.segments .ui.segment {
