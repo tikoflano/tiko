@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/actions.css"/>
         <link rel="stylesheet" type="text/css" href="css/card.css"/>
         <link rel="stylesheet" type="text/css" href="css/die.css"/>
@@ -29,21 +30,22 @@
         <script src="game/factories/board.js"></script>
         <script src="game/factories/player.js"></script>
         <script src="game/factories/deck.js"></script>
+        <script src="game/factories/togetherjs.js"></script>
         <script src="game/directives/card.js"></script>
         <script src="game/directives/figure.js"></script>
         <script src="game/directives/playerBoard.js"></script>
+        <script src="https://togetherjs.com/togetherjs-min.js"></script>
     </head>
-    <body ng-app="game" ng-controller="GameController as ctrl" ng-init="ctrl.init()" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">
-        <div class="ui container">
-            <div class="ui grid">
-                <div id="actions" class="center aligned row" ng-if="ctrl.players.length < ctrl.config.player.amount">
-                    <div class="column">
-                        <input type="color" ng-model="ctrl.new_player.color">
-                        <div class="ui action input">
-                            <input type="text" ng-model="ctrl.new_player.name" placeholder="Nombre">
-                            <button class="ui blue button" ng-click="ctrl.addPlayer()">Agregar jugador</button>
-                        </div>
-                    </div>
+    <body ng-app="game" ng-controller="GameController as ctrl" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">
+        <div id="main" class="ui basic segment" ng-class="{loading: ctrl.loading}">
+            <div class="ui middle aligned three column centered grid" ng-if="!ctrl.togetherjs.isRunning() && !ctrl.loading">
+                <div class="center aligned column">
+                    <button class="ui massive fluid blue button" ng-click="ctrl.newGame()">Crear partida</button>
+                </div>
+            </div>
+            
+            <div class="ui grid" ng-if="ctrl.togetherjs.isRunning()">
+                <div id="actions" class="center aligned row">
                 </div>
                 <div id="messages" class="row">
                     <div class="ui icon message" ng-if="ctrl.phase">

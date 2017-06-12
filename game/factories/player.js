@@ -1,7 +1,8 @@
 app.factory("Player", function(Config, PlayerCard, Board){
-    var Player = function(name, color){
+    var Player = function(name, color, id){
         this.name = name;
         this.color = color;
+        this.id = id;
         this.hand = [];
         this.active = false;
         this.player_cards = new Array(Config.player.player_cards);

@@ -84,7 +84,8 @@ app.factory("NumberCard", function(Card, $q){
 app.factory("PlayerCard", function(Card){
     var PlayerCard = function(player){
         this.type = "player";
-        this.player = player;
+//        this.player = player;
+        this.color = player.color;
     };
     PlayerCard.prototype = new Card();
     PlayerCard.prototype.constructor = PlayerCard;

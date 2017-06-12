@@ -1,12 +1,13 @@
-app.controller("GameController", function($scope, $q, Config, Utils, Player, Deck, Board, PlayerCard) {
+app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS, Player, Board, PlayerCard) {
     var self = this;
     
     self.config = Config;
     self.message = false;
     self.phase = false;
     
-    self.new_player = {name: "", color: "#f0f0f0"};
-    self.deck = new Deck();
+    self.loading = false;
+    self.local_player = {};
+    
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
         {color: "black", selected: false, number: null},
@@ -16,15 +17,19 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
     self.players = [];    
     self.active_player = {};
     
-    self.showBoard = function(player){
-        $scope.$broadcast("show-board", player);
+    //TogetherJS
+    self.togetherjs = new TogetherJS(self);
+    
+    
+    //Controller Functions
+    
+    self.newGame = function(){
+        self.loading = true;
+        self.togetherjs.run();
     };
     
-    self.init = function(){
-        self.new_player = {name: "John Doe", color: "#FF5722"};
-        self.addPlayer();
-        self.new_player = {name: "Robin Hood", color: "#03A9F4"};
-        self.addPlayer();
+    self.showBoard = function(player){
+        $scope.$broadcast("show-board", player);
     };
     
     self.playPhase = function(){
@@ -41,9 +46,9 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
         });
     };
     
-    self.addPlayer = function(){
+    self.addPlayer = function(name, color){
         self.message = false;
-        if(!self.new_player.name){
+        if(!name){
             self.message = {type: "error", header: "Error", message: "Enter player's name"};
             return false;
         }
@@ -52,15 +57,15 @@ app.controller("GameController", function($scope, $q, Config, Utils, Player, Dec
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(self.new_player.name, self.new_player.color);
-        player.refillHand(self.deck);
+        var player = new Player(name, color);
+//        player.refillHand(self.deck);
         self.players.push(player);
         
         if(self.players.length == Config.player.amount){
             self.phase = {text: "Iniciar partida", fn: self.startGame};
         }
         
-        self.new_player = {};
+        return player;
     };
     
     self.startGame = function(){
