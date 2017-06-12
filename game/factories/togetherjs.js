@@ -1,4 +1,4 @@
-app.factory("TogetherJS", function($timeout, Deck, $window){    
+app.factory("TogetherJS", function($timeout, Deck){    
     TogetherJS.config("dontShowClicks", true);
     TogetherJS.config("suppressJoinConfirmation", true);
     
@@ -24,14 +24,13 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
             });
 
             var session = TogetherJS.require("session");
-            session.on("self-updated", function() {
+            session.on("self-updated", function(){
                 $timeout(function(){
                     var player = TogetherJS.require("peers").Self;
                     ctrl.local_player.name = player.name ? player.name : player.defaultName;
                     ctrl.local_player.color = player.color;
                 });
             });
-
         });
 
         TogetherJS.hub.on("togetherjs.hello", function(msg){
@@ -40,7 +39,7 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
                     var new_player = ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
                 }
                 if(ctrl.host){
-                    TogetherJS.send({type: "get-deck", deck: ctrl.deck});
+                    TogetherJS.send({type: "get-deck", deck_order: ctrl.deck.order});
                 }
             });
         });
@@ -67,7 +66,7 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
 
         TogetherJS.hub.on("get-deck", function(msg){
             $timeout(function(){
-                ctrl.deck = msg.deck;
+                ctrl.deck = new Deck(msg.deck_order);
             });
         });
         
@@ -75,6 +74,24 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
             $timeout(function(){
                 ctrl.phase = {text: "Iniciar partida", fn: ctrl.startGame, args: msg.order};
                 ctrl.playPhase();
+            });
+        });
+        
+        TogetherJS.hub.on("card-clicked", function(msg){
+            $timeout(function(){
+                var elementFinder = TogetherJS.require("elementFinder");
+                var element = angular.element(elementFinder.findElement(msg.element)).scope();
+                
+                element[msg.element_name].active = ! element[msg.element_name].active;
+            });
+        });
+        
+        TogetherJS.hub.on("end-turn", function(msg){
+            $timeout(function(){
+                ctrl.nextPlayer().then(function(phase){
+                    ctrl.phase = phase;
+                    ctrl.playPhase();
+                });
             });
         });
     };
@@ -89,6 +106,11 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
     
     TJS.prototype.send = function(event){
         TogetherJS.send(event);
+    };
+    
+    TJS.prototype.elementFinder = function(element){
+        var elementFinder = TogetherJS.require("elementFinder");
+        return elementFinder.elementLocation(element);
     };
     
     return TJS;

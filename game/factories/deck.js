@@ -1,5 +1,5 @@
 app.factory("Deck", function(NumberCard, ActionCard, $q){
-    var Deck = function(){
+    var Deck = function(order){
         this.cards = [];
         
         for(var i = 1; i <= 6; i++){
@@ -83,12 +83,14 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             }});
         }));
         
-        this.shuffle();
-    };
-    
-    
-    Deck.prototype.shuffle = function(){
-        angular.copy(_.shuffle(this.cards), this.cards);
+        if(angular.isUndefined(order)){
+            this.order = _.shuffle(_.times(this.cards.length));
+            var order = angular.copy(this.order);
+        }
+        
+        this.cards = _.orderBy(this.cards, function(){
+            return order.shift();
+        });
     };
     
     return Deck;

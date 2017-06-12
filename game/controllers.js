@@ -7,8 +7,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.loading = false;
     self.local_player = {};
+    self.active_player = {};
     self.host = false;
     
+    self.deck = {};
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
         {color: "black", selected: false, number: null},
@@ -16,7 +18,6 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         {color: "blue", selected: false, number: null}
     ];
     self.players = [];    
-    self.active_player = {};
     self.togetherjs = new TogetherJS(self);
     
     self.newGame = function(){
@@ -26,6 +27,13 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.showBoard = function(player){
         $scope.$broadcast("show-board", player);
+    };
+    
+    self.changeActive = function(card, element_name, ui_element){
+        if(self.local_player != self.active_player){return;}
+        
+        card.active = !card.active;
+        self.togetherjs.send({type: "card-clicked", element_name: element_name, element: self.togetherjs.elementFinder(ui_element)});
     };
     
     self.playPhase = function(){
@@ -85,8 +93,6 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         self.players[0].active = true;
         self.active_player = self.players[0];
         
-        console.log(self.active_player, self.local_player)
-        
         if(self.active_player.id == self.local_player.id){
             return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
         }
@@ -122,7 +128,6 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
                 return next_phase;
             }
         });
-        
     };
     
     self.throwDice = function(){
@@ -145,7 +150,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var player_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
                     player_cards.push({row: i, column: j});
                 }
                 if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
@@ -188,7 +193,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var cells = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
                     cells.push({row: i, column: j});
                 }
             }
@@ -230,7 +235,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
                     selected_cards.push({row: i, column: j});
                 }
             } 
@@ -253,7 +258,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
                     selected_cards.push({row: i, column: j});
                 }
             } 
@@ -433,6 +438,12 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             die.active = false;
         });
         
+        self.togetherjs.send({type: "end-turn", board: self.board, players: self.players});
+        
+        return self.nextPlayer();
+    }; 
+    
+    self.nextPlayer = function(){
         var active_player_index;
         for(var i = 0, len = self.players.length; i < len; i++){
             if(self.players[i].active){
@@ -445,13 +456,16 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         self.players[next_index].active = true;
         self.active_player = self.players[next_index];
         
-        if(!self.board.isFull() || self.active_player.hasActionCard()){
+        if(self.active_player.id != self.local_player.id){
+            return $q.resolve({text: "Esperando a "+self.active_player.name, fn: function(){}});
+        }
+        else if(!self.board.isFull() || self.active_player.hasActionCard()){
             return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
         }
         else{
             return $q.resolve({text: "Lanzar 2 dados", fn: self.throwDice});
         }
-    }; 
+    };
     
     self.endGame = function(){
         var winning_score = _.maxBy(self.players, "score").score;

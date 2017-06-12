@@ -81,8 +81,8 @@
                             </div>
                             <div class="hand">
                                 <div class="ui horizontal segments">
-                                    <div class="ui segment" ng-repeat="number_card in player.hand" >
-                                        <card card="number_card" ng-click="number_card.active = player.active && !number_card.active" ></card>
+                                    <div class="ui segment" ng-repeat="card in player.hand" >
+                                        <card card="card" ng-click="player.active && ctrl.changeActive(card, 'card', $event.currentTarget)" ></card>
                                     </div>
                                 </div>
                             </div>
@@ -92,15 +92,17 @@
                 </div>
                 <div id="dice" class="centered row">
                     <div class="ui horizontal segments">
-                        <span class="ui die compact segment" ng-repeat="die in ctrl.dice" ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" ng-click="die.active = !die.active"></span>
+                        <span class="ui die compact segment" ng-repeat="die in ctrl.dice" 
+                              ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" 
+                              ng-click="ctrl.changeActive(die, 'die', $event.currentTarget)"></span>
                     </div>
                     <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                 </div>
                 <div class="board centered row">
                     <div class="ui compact segments">
                         <div class="ui horizontal segments" ng-repeat="row in ctrl.board.rows">
-                            <div class="ui segment" ng-repeat="number_card in row" >
-                                <card ng-click="number_card.active = !number_card.active" card="number_card"></card>
+                            <div class="ui segment" ng-repeat="card in row" >
+                                <card ng-click="ctrl.changeActive(card, 'card', $event.currentTarget)" card="card"></card>
                             </div>
                         </div>
                     </div>
