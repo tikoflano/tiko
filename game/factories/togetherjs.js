@@ -13,13 +13,14 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
 
         TogetherJS.hub.on("togetherjs.init-connection", function(msg){
             $timeout(function(){
-                var player = TogetherJS.require("peers").Self;
-                ctrl.local_player = ctrl.addPlayer(player.name ? player.name : player.defaultName, player.color);
-                ctrl.loading = false;
                 if(!msg.peerCount){
                     ctrl.deck = new Deck();
-                    ctrl.local_player.refillHand(ctrl.deck);
+                    ctrl.host = true;
                 }
+                
+                var local_peer = TogetherJS.require("peers").Self;
+                ctrl.local_player = ctrl.addPlayer(local_peer.name ? local_peer.name : local_peer.defaultName, local_peer.color, local_peer.id);
+                ctrl.loading = false;
             });
 
             var session = TogetherJS.require("session");
@@ -35,28 +36,39 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
 
         TogetherJS.hub.on("togetherjs.hello", function(msg){
             $timeout(function(){
-                TogetherJS.send({type: "get-deck", deck: ctrl.deck});
-                ctrl.addPlayer(msg.name, msg.color).refillHand(ctrl.deck);
+                if(!_.find(ctrl.players, {id: msg.peer.id})){
+                    var new_player = ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
+                }
+                if(ctrl.host){
+                    TogetherJS.send({type: "get-deck", deck: ctrl.deck});
+                }
             });
         });
         
-//        TogetherJS.hub.on("togetherjs.hello-back", function(msg){
-//            $timeout(function(){
-//                var player = ctrl.addPlayer(msg.name, msg.color);
-//                player.refillHand(ctrl.deck);
-//            });
-//        });
+        TogetherJS.hub.on("togetherjs.hello-back", function(msg){
+            $timeout(function(){
+                var local_peer = TogetherJS.require("peers").Self;
+                if(!_.find(ctrl.players, {id: local_peer.id})){
+                    ctrl.local_player = ctrl.addPlayer(local_peer.name ? local_peer.name : local_peer.defaultName, local_peer.color, local_peer.id);
+                }
+                if(!_.find(ctrl.players, {id: msg.peer.id})){
+                    var new_player = ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
+                }
+            });
+        });
 
         TogetherJS.hub.on("get-deck", function(msg){
             $timeout(function(){
+                console.log("GET DECK")
                 ctrl.deck = msg.deck;
-                ctrl.local_player.refillHand(ctrl.deck);
             });
         });
         
-        TogetherJS.hub.on("togetherjs.peer-updated", function(msg){
+        TogetherJS.hub.on("togetherjs.peer-update", function(msg){
             $timeout(function(){
-                console.log("TIKO", msg)
+                var player = _.find(ctrl.players, {id: msg.peer.id});
+                player.name = msg.peer.name;
+                player.color = msg.peer.color;
             });
         });
     };

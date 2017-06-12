@@ -7,6 +7,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.loading = false;
     self.local_player = {};
+    self.host = false;
     
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
@@ -46,7 +47,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         });
     };
     
-    self.addPlayer = function(name, color){
+    self.addPlayer = function(name, color, id){
         self.message = false;
         if(!name){
             self.message = {type: "error", header: "Error", message: "Enter player's name"};
@@ -57,7 +58,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             self.message = {type: "error", header: "Error", message: "Can't add more players"};
             return false;
         }
-        var player = new Player(name, color);
+        var player = new Player(name, color, id);
 //        player.refillHand(self.deck);
         self.players.push(player);
         
