@@ -3,7 +3,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.config = Config;
     self.message = false;
-    self.phase = false;
+    self.phase = {text: "Esperando jugadores", fn: function(){}};
     
     self.loading = false;
     self.local_player = {};
@@ -17,12 +17,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     ];
     self.players = [];    
     self.active_player = {};
-    
-    //TogetherJS
     self.togetherjs = new TogetherJS(self);
-    
-    
-    //Controller Functions
     
     self.newGame = function(){
         self.loading = true;
@@ -59,22 +54,45 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             return false;
         }
         var player = new Player(name, color, id);
-//        player.refillHand(self.deck);
         self.players.push(player);
         
         if(self.players.length == Config.player.amount){
-            self.phase = {text: "Iniciar partida", fn: self.startGame};
+            if(self.host){
+                self.phase = {text: "Iniciar partida", fn: self.startGame};
+            }
+            else{
+                self.phase = {text: "Esperando inicio de partida", fn: function(){}};
+            }
         }
         
         return player;
     };
     
-    self.startGame = function(){
-        var starting_player = _.random(self.players.length - 1);
-        self.players[starting_player].active = true;
-        self.active_player = self.players[starting_player];
+    self.startGame = function(order){
+        if(self.host){
+            var order = _.shuffle(_.map(self.players, "id"));
+            self.togetherjs.send({type: "start-game", order: order});
+        }
         
-        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
+        self.players = _.orderBy(self.players, function(player){
+            return _.indexOf(order, player.id);
+        });
+        
+        _.forEach(self.players, function(player){
+            player.refillHand(self.deck);
+        });
+        
+        self.players[0].active = true;
+        self.active_player = self.players[0];
+        
+        console.log(self.active_player, self.local_player)
+        
+        if(self.active_player.id == self.local_player.id){
+            return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
+        }
+        else{
+            return $q.resolve({text: "Esperando a "+self.active_player.name, fn: function(){}});
+        }
     };
     
     self.playCard = function(){

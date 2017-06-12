@@ -56,19 +56,25 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
                 }
             });
         });
-
-        TogetherJS.hub.on("get-deck", function(msg){
-            $timeout(function(){
-                console.log("GET DECK")
-                ctrl.deck = msg.deck;
-            });
-        });
         
         TogetherJS.hub.on("togetherjs.peer-update", function(msg){
             $timeout(function(){
                 var player = _.find(ctrl.players, {id: msg.peer.id});
                 player.name = msg.peer.name;
                 player.color = msg.peer.color;
+            });
+        });
+
+        TogetherJS.hub.on("get-deck", function(msg){
+            $timeout(function(){
+                ctrl.deck = msg.deck;
+            });
+        });
+        
+        TogetherJS.hub.on("start-game", function(msg){
+            $timeout(function(){
+                ctrl.phase = {text: "Iniciar partida", fn: ctrl.startGame, args: msg.order};
+                ctrl.playPhase();
             });
         });
     };
@@ -79,6 +85,10 @@ app.factory("TogetherJS", function($timeout, Deck, $window){
     
     TJS.prototype.isRunning = function(){
         return TogetherJS.running;
+    };
+    
+    TJS.prototype.send = function(event){
+        TogetherJS.send(event);
     };
     
     return TJS;
