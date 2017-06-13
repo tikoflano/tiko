@@ -49,9 +49,14 @@
                 </div>
                 <div id="messages" class="row">
                     <div class="ui icon message" ng-if="ctrl.phase">
-                        <i class="info circle icon"></i>
+                        <i class="icon" 
+                           ng-class="{'info circle' : !ctrl.active_player,'hourglass end' : ctrl.active_player && ctrl.active_player != ctrl.local_player, 'video play' : ctrl.active_player == ctrl.local_player}"></i>
                         <div class="content">
-                            <div class="header">Fase actual</div>
+                            <div class="header">
+                                <span ng-if="!ctrl.active_player">Juego no iniciado</span>
+                                <span ng-if="ctrl.active_player && ctrl.active_player != ctrl.local_player">Esperando a {{ctrl.active_player.name}}</span>
+                                <span ng-if="ctrl.active_player == ctrl.local_player">Fase actual</span>
+                            </div>
                             <p>{{ctrl.phase.text}}</p>
                         </div>
                     </div>

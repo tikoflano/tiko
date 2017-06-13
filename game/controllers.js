@@ -3,14 +3,14 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.config = Config;
     self.message = false;
-    self.phase = {text: "Esperando jugadores", fn: function(){}};
+    self.phase = {text: "Esperando jugadores", fn: function(){return $q.resolve();}};
     
     self.loading = false;
-    self.local_player = {};
-    self.active_player = {};
+    self.local_player = false;
+    self.active_player = false;
     self.host = false;
     
-    self.deck = {};
+    self.deck = false;
     self.board = new Board(Config.board.width, Config.board.height);
     self.dice = [
         {color: "black", selected: false, number: null},
@@ -41,10 +41,15 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         
         self.phase.fn(self.phase.args)
         .then(function(next_phase){
-            self.phase = next_phase;
+            if(self.local_player == self.active_player){
+                self.togetherjs.send({type: "play-phase", phase: self.phase});
+            }
+            if(next_phase){
+                self.phase = next_phase;
+            }
         })
         .catch(function(error_message){
-            if(error_message){
+            if(error_message && self.local_player == self.active_player){
                 self.message = {type: "error", header: "", message: error_message};
             }
         });
@@ -69,7 +74,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
                 self.phase = {text: "Iniciar partida", fn: self.startGame};
             }
             else{
-                self.phase = {text: "Esperando inicio de partida", fn: function(){}};
+                self.phase = {text: "Esperando inicio de partida", fn: function(){return $q.resolve();}};
             }
         }
         
@@ -93,12 +98,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         self.players[0].active = true;
         self.active_player = self.players[0];
         
-        if(self.active_player.id == self.local_player.id){
-            return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
-        }
-        else{
-            return $q.resolve({text: "Esperando a "+self.active_player.name, fn: function(){}});
-        }
+        return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
     };
     
     self.playCard = function(){
@@ -131,15 +131,19 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     };
     
     self.throwDice = function(){
-        var selected_dice = _.filter(self.dice, "active");
-        
-        if(selected_dice.length != 2){
-            return $q.reject("Select 2 dice to throw");
+        if(self.local_player == self.active_player){
+            var selected_dice = _.filter(self.dice, "active");
+
+            if(selected_dice.length != 2){
+                return $q.reject("Select 2 dice to throw");
+            }
+
+            _.forEach(_.filter(self.dice, "active"), function(die){
+                die.number = self.config.debug ? self.number :_.random(1, 6);
+            });
         }
         
-        _.forEach(_.filter(self.dice, "active"), function(die){
-            die.number = self.config.debug ? self.number :_.random(1, 6);
-        });
+        self.togetherjs.send({type: "dice-thrown", dice: self.dice});
         
         return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});
     };
@@ -438,7 +442,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             die.active = false;
         });
         
-        self.togetherjs.send({type: "end-turn", board: self.board, players: self.players});
+        self.togetherjs.send({type: "end-turn"});
         
         return self.nextPlayer();
     }; 
@@ -456,10 +460,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         self.players[next_index].active = true;
         self.active_player = self.players[next_index];
         
-        if(self.active_player.id != self.local_player.id){
-            return $q.resolve({text: "Esperando a "+self.active_player.name, fn: function(){}});
-        }
-        else if(!self.board.isFull() || self.active_player.hasActionCard()){
+        if(!self.board.isFull() || self.active_player.hasActionCard()){
             return $q.resolve({text: "Jugar carta de la mano", fn: self.playCard});
         }
         else{

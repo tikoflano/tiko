@@ -86,12 +86,21 @@ app.factory("TogetherJS", function($timeout, Deck){
             });
         });
         
-        TogetherJS.hub.on("end-turn", function(msg){
+        TogetherJS.hub.on("play-phase", function(){
             $timeout(function(){
-                ctrl.nextPlayer().then(function(phase){
-                    ctrl.phase = phase;
-                    ctrl.playPhase();
-                });
+                ctrl.playPhase();
+            });
+        });
+        
+        TogetherJS.hub.on("dice-thrown", function(msg){
+            $timeout(function(){
+                ctrl.dice = msg.dice;
+            });
+        });
+        
+        TogetherJS.hub.on("end-turn", function(){
+            $timeout(function(){
+                ctrl.playPhase();
             });
         });
     };
