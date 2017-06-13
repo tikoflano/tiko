@@ -130,12 +130,13 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         });
     };
     
-    self.throwDice = function(){
+    self.throwDice = function(amount){    
         if(self.local_player == self.active_player){
+            amount = angular.isDefined(amount) ? amount : 2;
             var selected_dice = _.filter(self.dice, "active");
 
-            if(selected_dice.length != 2){
-                return $q.reject("Select 2 dice to throw");
+            if(selected_dice.length != amount){
+                return $q.reject("Select "+amount+" dice to throw");
             }
 
             _.forEach(_.filter(self.dice, "active"), function(die){

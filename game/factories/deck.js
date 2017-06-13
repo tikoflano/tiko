@@ -27,12 +27,16 @@ app.factory("Deck", function(NumberCard, ActionCard, $q){
             return ctrl.endTurn();
         }));
         
+        this.cards.unshift(new ActionCard("Lanzar 1 dado", function(ctrl){
+            
+            return $q.resolve({text: "Lanzar 1 dado", fn: ctrl.throwDice, args: 1});
+        }));
+        
         this.cards.unshift(new ActionCard("Lanzar 3 dados", function(ctrl){
             _.forEach(ctrl.dice, function(die){
                 die.active = true;
-                die.number = _.random(1, 6);
             });
-            return $q.resolve({text: "Comprobar resultados", fn: ctrl.checkHits});
+            return $q.resolve({text: "Lanzar 3 dados", fn: ctrl.throwDice, args: 3});
         }));
              
         this.cards.unshift(new ActionCard("Intercambiar carta al rival", function(ctrl){
