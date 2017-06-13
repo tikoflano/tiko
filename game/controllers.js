@@ -155,7 +155,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var player_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     player_cards.push({row: i, column: j});
                 }
                 if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
@@ -198,7 +198,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var cells = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     cells.push({row: i, column: j});
                 }
             }
@@ -240,7 +240,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     selected_cards.push({row: i, column: j});
                 }
             } 
@@ -263,7 +263,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var selected_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player_id == self.active_player.id){
+                if(self.board.rows[i][j].active && self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     selected_cards.push({row: i, column: j});
                 }
             } 
