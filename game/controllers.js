@@ -271,11 +271,11 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         
         var chains = _.filter(Utils.getChains(selected_cards), function(group){ return group.length == Config.figure.size; });
         if(chains.length == 0){
-            return $q.reject("Select one group of "+Config.figure.size+" contiguous cards of your color");
+            return $q.reject("Select one group of "+Config.figure.size+" adyacent cards of your color");
         }
         
         if(chains.length > 1){
-            return $q.reject("Select just one group of "+Config.figure.size+" contiguous cards of your color");
+            return $q.reject("Select just one group of "+Config.figure.size+" adyacent cards of your color");
         }
         
         _.forEach(selected_cards, function(card){
