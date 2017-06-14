@@ -58,12 +58,12 @@ app.factory("NumberCard", function(Card, $q){
             }
 
             if(!empty && (
-                    (selected_position.row <= 0 || ctrl.board.rows[selected_position.row - 1][selected_position.column] == "empty") &&
-                    (selected_position.column + 1 >= ctrl.board.rows[selected_position.row].length || ctrl.board.rows[selected_position.row][selected_position.column + 1] == "empty") &&
-                    (selected_position.row + 1 >= ctrl.board.rows.length || ctrl.board.rows[selected_position.row + 1][selected_position.column] == "empty") &&
-                    (selected_position.column <= 0 || ctrl.board.rows[selected_position.row][selected_position.column - 1] == "empty")
+                    (selected_position.row <= 0 || ctrl.board.rows[selected_position.row - 1][selected_position.column].type == "empty") &&
+                    (selected_position.column + 1 >= ctrl.board.rows[selected_position.row].length || ctrl.board.rows[selected_position.row][selected_position.column + 1].type == "empty") &&
+                    (selected_position.row + 1 >= ctrl.board.rows.length || ctrl.board.rows[selected_position.row + 1][selected_position.column].type == "empty") &&
+                    (selected_position.column <= 0 || ctrl.board.rows[selected_position.row][selected_position.column - 1].type == "empty")
                 )){
-                return $q.reject("Select one position next to a card in the board");
+                return $q.reject("Select one position adyacent to a number card in the board");
             }
 
             ctrl.board.rows[selected_position.row][selected_position.column] = this;
