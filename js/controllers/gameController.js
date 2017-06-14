@@ -103,6 +103,29 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         return player;
     };
     
+    self.removePlayer = function(player){
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == player){
+                    self.board.removeCardInCell(i, j);
+                }
+            }
+        }
+        
+        if(player == self.active_player){
+            self.endTurn();
+        }
+        
+        _.pull(self.players, player);
+
+        if(!self.active_player){
+            self.phase = {text: "Esperando jugadores"};
+        }
+        else if(self.active_player && self.players.length == 1){
+            self.endGame();
+        }
+    };
+    
     self.startGame = function(order){
         if(self.host){
             var order = _.shuffle(_.map(self.players, "id"));
@@ -449,7 +472,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.endTurn = function(){
         if(self.isMyTurn()){
-            self.togetherjs.send({type: "end-turn"});
+            self.togetherjs.send({type: "play-phase"});
         }
         
         var playing_players = _.filter(self.players, {finished: false});

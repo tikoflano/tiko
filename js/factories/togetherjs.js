@@ -2,8 +2,6 @@ app.factory("TogetherJS", function($timeout, Deck){
     TogetherJS.config("dontShowClicks", true);
     TogetherJS.config("suppressJoinConfirmation", true);
     
-    console.log(TogetherJS)
-    
     var TJS = function(ctrl){        
         TogetherJS.on("close", function(){
             $timeout(function(){
@@ -38,7 +36,7 @@ app.factory("TogetherJS", function($timeout, Deck){
         TogetherJS.hub.on("togetherjs.hello", function(msg){
             $timeout(function(){
                 if(!_.find(ctrl.players, {id: msg.peer.id})){
-                    var new_player = ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
+                    ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
                 }
                 if(ctrl.host){
                     TogetherJS.send({type: "get-deck", deck_order: ctrl.deck.order});
@@ -53,8 +51,14 @@ app.factory("TogetherJS", function($timeout, Deck){
                     ctrl.local_player = ctrl.addPlayer(local_peer.name ? local_peer.name : local_peer.defaultName, local_peer.color, local_peer.id);
                 }
                 if(!_.find(ctrl.players, {id: msg.peer.id})){
-                    var new_player = ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
+                    ctrl.addPlayer(msg.peer.name, msg.peer.color, msg.peer.id);
                 }
+            });
+        });
+        
+        TogetherJS.hub.on("togetherjs.bye", function(msg){
+            $timeout(function(){
+                ctrl.removePlayer(_.find(ctrl.players, {id: msg.peer.id}));
             });
         });
         
@@ -112,12 +116,6 @@ app.factory("TogetherJS", function($timeout, Deck){
         TogetherJS.hub.on("dice-thrown", function(msg){
             $timeout(function(){
                 ctrl.dice = msg.dice;
-            });
-        });
-        
-        TogetherJS.hub.on("end-turn", function(){
-            $timeout(function(){
-                ctrl.playPhase();
             });
         });
     };
