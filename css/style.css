@@ -1,5 +1,8 @@
-#main {
+body #main {
   height: 100%;
   padding: 0px; }
-  #main > .middle.aligned.column.centered.grid {
+  body #main > .middle.aligned.column.centered.grid {
     height: 100%; }
+
+#togetherjs-dock.togetherjs-dock-right {
+  bottom: 6px !important; }

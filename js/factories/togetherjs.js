@@ -2,6 +2,8 @@ app.factory("TogetherJS", function($timeout, Deck){
     TogetherJS.config("dontShowClicks", true);
     TogetherJS.config("suppressJoinConfirmation", true);
     
+    console.log(TogetherJS)
+    
     var TJS = function(ctrl){        
         TogetherJS.on("close", function(){
             $timeout(function(){

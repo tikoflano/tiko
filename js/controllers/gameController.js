@@ -50,20 +50,22 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     self.playPhase = function(){
         self.message = false;
         
-        self.phase.fn(self.phase.args)
-        .then(function(next_phase){
-            if(self.isMyTurn()){
-                self.togetherjs.send({type: "play-phase", phase: self.phase});
-            }
-            if(next_phase){
-                self.phase = next_phase;
-            }
-        })
-        .catch(function(error_message){
-            if(error_message && self.isMyTurn()){
-                self.message = {type: "error", header: "", message: error_message};
-            }
-        });
+        if(_.isFunction(self.phase.fn)){
+            self.phase.fn(self.phase.args)
+            .then(function(next_phase){
+                if(self.isMyTurn()){
+                    self.togetherjs.send({type: "play-phase", phase: self.phase});
+                }
+                if(next_phase){
+                    self.phase = next_phase;
+                }
+            })
+            .catch(function(error_message){
+                if(error_message && self.isMyTurn()){
+                    self.message = {type: "error", header: "", message: error_message};
+                }
+            });
+        }
     };
     
     self.addPlayer = function(name, color, id){
@@ -437,6 +439,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     };
     
     self.endTurn = function(){
+        if(self.isMyTurn()){
+            self.togetherjs.send({type: "end-turn"});
+        }
+        
         var playing_players = _.filter(self.players, {finished: false});
         var finished_players = _.filter(self.players, {finished: true});
         if(playing_players.length == 0){
@@ -462,10 +468,6 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             die.number = null;
             die.active = false;
         });
-        
-        if(self.isMyTurn()){
-            self.togetherjs.send({type: "end-turn"});
-        }
         
         return self.nextPlayer();
     }; 
@@ -497,10 +499,6 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         self.message = {type: "positive", header: "Game Over", message: (winners.length == 1 ? "Winner: " + winners[0] : "Winners: " + _.join(winners, ", "))+" with "+winning_score+" points"};
         self.phase = false;
         self.active_player = false;
-        
-        if(self.isMyTurn()){
-            self.togetherjs.send({type: "end-turn"});
-        }
         
         return $q.reject();
     };
