@@ -344,13 +344,26 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             self.board.removeCardInCell(card.row, card.column);
         });
         
+        if(!self.figureCanBeAdded(selected_cards)){
+            self.active_player.finished = true;
+            return self.endTurn();
+        }
+        
+        $scope.$broadcast("show-board", self.active_player, selected_cards);
+        return $q.resolve({text: "Agregar figura", fn: self.addFigure, args: selected_cards});
+    };
+    
+    self.figureCanBeAdded = function(selected_cards){
         //Check if the figure can be added
         var min_figure = Utils.minFigure(selected_cards);
+        
         var can_be_added = false;
         for(var i = 0, len = self.active_player.board.rows[0].length; i < len; i++){
             var fits = true;
             for(var j = 0, len2 = min_figure.length; j < len2; j++){
-                if((min_figure[j].row + i) >= self.active_player.board.rows.length || self.active_player.board.rows[min_figure[j].row][min_figure[j].column + i].type != "empty"){
+                if((min_figure[j].row) >= self.active_player.board.rows.length || 
+                        (min_figure[j].column + i) >= self.active_player.board.rows[0].length || 
+                        self.active_player.board.rows[min_figure[j].row][min_figure[j].column + i].type != "empty"){
                     fits = false;
                     break;
                 }
@@ -360,13 +373,8 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
                 break;
             }
         }
-        if(!can_be_added){
-            self.active_player.finished = true;
-            return self.endTurn();
-        }
         
-        $scope.$broadcast("show-board", self.active_player, selected_cards);
-        return $q.resolve({text: "Agregar figura", fn: self.addFigure, args: selected_cards});
+        return can_be_added;
     };
     
     self.addFigure = function(figure){     
@@ -483,17 +491,19 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         
         var playing_players = _.filter(self.players, {finished: false});
         var finished_players = _.filter(self.players, {finished: true});
+        
         if(playing_players.length == 0){
             return self.endGame();
         }
-        else if(playing_players.length == 1){
+        else if(playing_players.length == 1 && self.players.length > 1){
             var max_score = 0;
             for(var i = 0, len = finished_players.length; i < len; i++){
                 max_score = Math.max(max_score, finished_players[i].score);
             }
             
-            if(playing_players[0].score > max_score)
-            return self.endGame();
+            if(playing_players[0].score > max_score){
+                return self.endGame();
+            }
         }
         else if(self.active_player.score >= self.config.game.target_score){
             return self.endGame();
