@@ -49,9 +49,17 @@
         
         .hand > .horizontal.segments {
             margin-bottom: 0px;
+            border: none;
+            box-shadow: none;
             
             & > .ui.segment{
                 padding: 0px;
+                border: none;
+                box-shadow: none;
+                
+                &:not(:last-child){
+                    margin-right: 2px; 
+                }
             }
         }
     }

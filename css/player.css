@@ -28,6 +28,12 @@
       #players .player .player-cards .player-card:not(:last-child) {
         margin-right: 3px; }
   #players .player .hand > .horizontal.segments {
-    margin-bottom: 0px; }
+    margin-bottom: 0px;
+    border: none;
+    box-shadow: none; }
     #players .player .hand > .horizontal.segments > .ui.segment {
-      padding: 0px; }
+      padding: 0px;
+      border: none;
+      box-shadow: none; }
+      #players .player .hand > .horizontal.segments > .ui.segment:not(:last-child) {
+        margin-right: 2px; }
