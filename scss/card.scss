@@ -15,6 +15,9 @@ card {
             background: rgba(255, 255, 0, 0.83);
             border-color: rgba(255, 255, 0, 0.83);
         }
+        &.hit{
+            border-color: red;
+        }
     }
     
     .number.ui.segments{

@@ -157,22 +157,15 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             self.togetherjs.send({type: "dice-thrown", dice: self.dice});
         }
         
-        
-        return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});
-    };
-    
-    self.checkHits = function(){
-        //Check cards number
+        //Check hit cards
         var hit_cards = [];
-        var player_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
-                    player_cards.push({row: i, column: j});
-                }
                 if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
                     _.forEach(_.filter(self.dice, "active"), function(die){
                         if(self.board.rows[i][j].numbers[die.color] && die.number == self.board.rows[i][j].numbers[die.color]){
+                            self.board.rows[i][j].hit = true;
+                            console.log("HIT", self.board.rows[i][j])
                             hit_cards.push({row: i, column: j});
                             return false;
                         }
@@ -181,8 +174,22 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             } 
         }
         
+        return $q.resolve({text: "Comprobar resultados", fn: self.checkHits, args: hit_cards});
+    };
+    
+    self.checkHits = function(hit_cards){
         if(!hit_cards.length){
             return self.endTurn();
+        }
+        
+        //Get player cards coords
+        var player_cards = [];
+        for(var i = 0, len = self.board.rows.length; i < len; i++){
+            for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
+                    player_cards.push({row: i, column: j});
+                }
+            } 
         }
         
         if(hit_cards.length <= self.active_player.player_cards.length){
@@ -210,6 +217,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var cells = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
+                self.board.rows[i][j].hit = false;
                 if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     cells.push({row: i, column: j});
                 }

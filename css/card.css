@@ -13,6 +13,8 @@ card {
     card > div.active {
       background: rgba(255, 255, 0, 0.83);
       border-color: rgba(255, 255, 0, 0.83); }
+    card > div.hit {
+      border-color: red; }
   card .number.ui.segments {
     border: none;
     box-shadow: none; }

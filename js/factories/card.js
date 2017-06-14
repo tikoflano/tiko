@@ -24,6 +24,7 @@ app.factory("EmptyCard", function(Card){
 app.factory("NumberCard", function(Card, $q){
     var NumberCard = function(a, b, c){
         this.type = "number";
+        this.hit = false;
         this.numbers = {
             black: a,
             green: b,
