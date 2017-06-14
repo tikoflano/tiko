@@ -29,6 +29,6 @@ app.directive("playerBoard", function ($timeout) {
                 $modal.modal("hide");
             };
         },
-        templateUrl: "game/directives/templates/player_board.html"
+        templateUrl: "game/templates/player_board.html"
     };
 });
