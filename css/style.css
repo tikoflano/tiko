@@ -1,4 +1,5 @@
 #main {
-  height: 100%; }
+  height: 100%;
+  padding: 0px; }
   #main > .middle.aligned.column.centered.grid {
     height: 100%; }

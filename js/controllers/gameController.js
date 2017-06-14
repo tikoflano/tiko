@@ -496,6 +496,12 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var winners = _.map(_.filter(self.players, {score: winning_score}), "name");
         self.message = {type: "positive", header: "Game Over", message: (winners.length == 1 ? "Winner: " + winners[0] : "Winners: " + _.join(winners, ", "))+" with "+winning_score+" points"};
         self.phase = false;
+        self.active_player = false;
+        
+        if(self.isMyTurn()){
+            self.togetherjs.send({type: "end-turn"});
+        }
+        
         return $q.reject();
     };
 });
