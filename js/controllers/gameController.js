@@ -3,7 +3,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.config = Config;
     self.message = false;
-    self.phase = {text: "Esperando jugadores", fn: function(){return $q.resolve();}};
+    self.phase = {text: "Esperando jugadores"};
     
     self.loading = false;
     self.local_player = false;
@@ -20,6 +20,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     self.players = [];    
     self.togetherjs = new TogetherJS(self);
     
+    self.isMyTurn = function(){
+        return self.active_player && self.local_player == self.active_player;
+    };
+    
     self.newGame = function(){
         self.loading = true;
         self.togetherjs.run();
@@ -30,10 +34,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     };
     
     self.changeActive = function(card, element_name, ui_element){
-        if(self.local_player != self.active_player){return;}
-        
-        card.active = !card.active;
-        self.togetherjs.send({type: "card-clicked", element_name: element_name, element: self.togetherjs.elementFinder(ui_element)});
+        if(self.isMyTurn()){
+            card.active = !card.active;
+            self.togetherjs.send({type: "card-clicked", element_name: element_name, element: self.togetherjs.elementFinder(ui_element)});
+        }        
     };
     
     self.playPhase = function(){
@@ -41,7 +45,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         
         self.phase.fn(self.phase.args)
         .then(function(next_phase){
-            if(self.local_player == self.active_player){
+            if(self.isMyTurn()){
                 self.togetherjs.send({type: "play-phase", phase: self.phase});
             }
             if(next_phase){
@@ -49,7 +53,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             }
         })
         .catch(function(error_message){
-            if(error_message && self.local_player == self.active_player){
+            if(error_message && self.isMyTurn()){
                 self.message = {type: "error", header: "", message: error_message};
             }
         });
@@ -131,7 +135,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     };
     
     self.throwDice = function(amount){    
-        if(self.local_player == self.active_player){
+        if(self.isMyTurn()){
             amount = angular.isDefined(amount) ? amount : 2;
             var selected_dice = _.filter(self.dice, "active");
 

@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css"/>
+        <link rel="stylesheet" type="text/css" href="lib/semantic/semantic.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/actions.css"/>
         <link rel="stylesheet" type="text/css" href="css/card.css"/>
@@ -18,22 +18,22 @@
         <link rel="stylesheet" type="text/css" href="css/figure.css"/>
         <link rel="stylesheet" type="text/css" href="css/player-board.css"/>
         
-        <script src="jquery/jquery-3.2.1.min.js"></script>
-        <script src="semantic/semantic.min.js"></script>
-        <script src="angular-1.6.4/angular.min.js"></script>
-        <script src="lodash/lodash.min.js"></script>
+        <script src="lib/jquery/jquery-3.2.1.min.js"></script>
+        <script src="lib/semantic/semantic.min.js"></script>
+        <script src="lib/angular-1.6.4/angular.min.js"></script>
+        <script src="lib/lodash/lodash.min.js"></script>
         
-        <script src="game/app.js"></script>
-        <script src="game/controllers/gameController.js"></script>
-        <script src="game/services/utils.js"></script>
-        <script src="game/factories/card.js"></script>
-        <script src="game/factories/board.js"></script>
-        <script src="game/factories/player.js"></script>
-        <script src="game/factories/deck.js"></script>
-        <script src="game/factories/togetherjs.js"></script>
-        <script src="game/directives/card.js"></script>
-        <script src="game/directives/figure.js"></script>
-        <script src="game/directives/playerBoard.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/controllers/gameController.js"></script>
+        <script src="js/services/utils.js"></script>
+        <script src="js/factories/card.js"></script>
+        <script src="js/factories/board.js"></script>
+        <script src="js/factories/player.js"></script>
+        <script src="js/factories/deck.js"></script>
+        <script src="js/factories/togetherjs.js"></script>
+        <script src="js/directives/card.js"></script>
+        <script src="js/directives/figure.js"></script>
+        <script src="js/directives/playerBoard.js"></script>
         <script src="https://togetherjs.com/togetherjs-min.js"></script>
     </head>
     <body ng-app="game" ng-controller="GameController as ctrl" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">

@@ -86,6 +86,12 @@ app.factory("TogetherJS", function($timeout, Deck){
             });
         });
         
+        TogetherJS.hub.on("playerboard-card-clicked", function(msg){
+            $timeout(function(){
+                ctrl.active_player.board.rows[msg.coords.row][msg.coords.col].active = !ctrl.active_player.board.rows[msg.coords.row][msg.coords.col].active;
+            });
+        });
+        
         TogetherJS.hub.on("play-phase", function(){
             $timeout(function(){
                 ctrl.playPhase();

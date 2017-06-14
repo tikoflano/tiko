@@ -27,7 +27,7 @@
                 <div class="ui compact segments">
                     <div class="ui horizontal segments" ng-repeat="row in player.board.rows">
                         <div class="ui segment" ng-repeat="card in row" >
-                            <card ng-click="card.active = !card.active" card="card"></card>
+                            <card ng-click="changeActive(card)" card="card"></card>
                         </div>
                     </div>
                 </div>

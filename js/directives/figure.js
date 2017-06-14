@@ -24,6 +24,6 @@ app.directive("figure", function (Utils) {
             });
 
         },
-        templateUrl: "game/templates/figure.html"
+        templateUrl: "js/templates/figure.html"
     };
 });

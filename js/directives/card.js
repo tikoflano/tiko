@@ -4,6 +4,6 @@ app.directive("card", function () {
         scope:{
             card: "="
         },
-        templateUrl: "game/templates/card.html"
+        templateUrl: "js/templates/card.html"
     };
 });
