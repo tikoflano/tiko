@@ -20,6 +20,15 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     self.players = [];    
     self.togetherjs = new TogetherJS(self);
     
+    self.spacebarPressed = function($event){
+        if(angular.element($event.target).is("body")){
+            $event.preventDefault();
+        }
+        if(self.phase &&  $event.key == " "){
+            self.playPhase();
+        }
+    };
+    
     self.isMyTurn = function(){
         return self.active_player && self.local_player == self.active_player;
     };

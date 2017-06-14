@@ -36,7 +36,7 @@
         <script src="js/directives/playerBoard.js"></script>
         <script src="https://togetherjs.com/togetherjs-min.js"></script>
     </head>
-    <body ng-app="game" ng-controller="GameController as ctrl" ng-keypress="ctrl.phase && $event.key == ' ' && ctrl.playPhase()">
+    <body ng-app="game" ng-controller="GameController as ctrl" ng-keypress="ctrl.spacebarPressed($event)">
         <div id="main" class="ui basic segment" ng-class="{loading: ctrl.loading}">
             <div class="ui middle aligned three column centered grid" ng-if="!ctrl.togetherjs.isRunning() && !ctrl.loading">
                 <div class="center aligned column">
