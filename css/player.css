@@ -11,7 +11,8 @@
   #players .player > .ui.horizontal.segments {
     margin: 0px 0px 5px 0px; }
     #players .player > .ui.horizontal.segments .ui.segment {
-      padding: 2px 0px; }
+      padding: 2px 0px;
+      min-width: 50px; }
       #players .player > .ui.horizontal.segments .ui.segment .circular.label {
         margin-top: 2px; }
       #players .player > .ui.horizontal.segments .ui.segment.name {
