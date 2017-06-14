@@ -87,7 +87,7 @@
                             <div class="hand">
                                 <div class="ui horizontal segments">
                                     <div class="ui segment" ng-repeat="card in player.hand" >
-                                        <card card="card" ng-click="player.active && ctrl.changeActive(card, 'card', $event.currentTarget)" ></card>
+                                        <card card="card" ng-click="player.active && ctrl.clickCard(card, $event.currentTarget)" ></card>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                     <div class="ui horizontal segments">
                         <span class="ui die compact segment" ng-repeat="die in ctrl.dice" 
                               ng-class="[die.color, {active: die.active}, die.number ? 'die-'+die.number : 'die-0']" 
-                              ng-click="ctrl.changeActive(die, 'die', $event.currentTarget)"></span>
+                              ng-click="ctrl.clickDie(die, $event.currentTarget)"></span>
                     </div>
                     <input type="number" ng-model="ctrl.number" ng-if="ctrl.config.debug">
                 </div>
@@ -107,7 +107,7 @@
                     <div class="ui compact segments">
                         <div class="ui horizontal segments" ng-repeat="row in ctrl.board.rows">
                             <div class="ui segment" ng-repeat="card in row" >
-                                <card ng-click="ctrl.changeActive(card, 'card', $event.currentTarget)" card="card"></card>
+                                <card ng-click="ctrl.clickCard(card, $event.currentTarget)" card="card"></card>
                             </div>
                         </div>
                     </div>

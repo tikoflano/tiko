@@ -33,10 +33,17 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         $scope.$broadcast("show-board", player);
     };
     
-    self.changeActive = function(card, element_name, ui_element){
+    self.clickCard = function(card, ui_element){
         if(self.isMyTurn()){
             card.active = !card.active;
-            self.togetherjs.send({type: "card-clicked", element_name: element_name, element: self.togetherjs.elementFinder(ui_element)});
+            self.togetherjs.send({type: "card-clicked", element: self.togetherjs.elementFinder(ui_element)});
+        }        
+    };
+    
+    self.clickDie = function(die, ui_element){
+        if(self.isMyTurn()){
+            die.active = !die.active;
+            self.togetherjs.send({type: "die-clicked", element: self.togetherjs.elementFinder(ui_element)});
         }        
     };
     
@@ -146,9 +153,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             _.forEach(_.filter(self.dice, "active"), function(die){
                 die.number = self.config.debug ? self.number :_.random(1, 6);
             });
+            
+            self.togetherjs.send({type: "dice-thrown", dice: self.dice});
         }
         
-        self.togetherjs.send({type: "dice-thrown", dice: self.dice});
         
         return $q.resolve({text: "Comprobar resultados", fn: self.checkHits});
     };
@@ -447,7 +455,9 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
             die.active = false;
         });
         
-        self.togetherjs.send({type: "end-turn"});
+        if(self.isMyTurn()){
+            self.togetherjs.send({type: "end-turn"});
+        }
         
         return self.nextPlayer();
     }; 

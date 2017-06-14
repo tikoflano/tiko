@@ -1,5 +1,5 @@
 <div ng-class="[card.type, {'active' : card.active}]">
-    <div ng-if="card.type == 'number'" class="ui number compact segments">
+    <div ng-if="card.type == 'number'" class="ui number compact segments" ng-class="{hit : card.hit}">
         <div class="ui horizontal compact segments">
             <div class="ui black die compact segment" ng-class="card.numbers.black ? 'die-'+card.numbers.black : ''"></div>
             <div class="ui green die compact segment" ng-class="card.numbers.green ? 'die-'+card.numbers.green : ''"></div>

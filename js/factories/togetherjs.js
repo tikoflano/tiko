@@ -82,7 +82,16 @@ app.factory("TogetherJS", function($timeout, Deck){
                 var elementFinder = TogetherJS.require("elementFinder");
                 var element = angular.element(elementFinder.findElement(msg.element)).scope();
                 
-                element[msg.element_name].active = ! element[msg.element_name].active;
+                element.card.active = !element.card.active;
+            });
+        });
+        
+        TogetherJS.hub.on("die-clicked", function(msg){
+            $timeout(function(){
+                var elementFinder = TogetherJS.require("elementFinder");
+                var element = angular.element(elementFinder.findElement(msg.element)).scope();
+                
+                element.die.active = !element.die.active;
             });
         });
         
