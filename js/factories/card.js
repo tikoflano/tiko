@@ -4,8 +4,6 @@ app.factory("Card", function(){
         this.active = false;
     };
     
-    Card.prototype.isEmpty = function(){return false;};
-    
     return Card;
 });
 
@@ -15,8 +13,6 @@ app.factory("EmptyCard", function(Card){
     };
     EmptyCard.prototype = new Card();
     EmptyCard.prototype.constructor = EmptyCard;
-    
-    EmptyCard.prototype.isEmpty = function(){return true;};
     
     return EmptyCard;
 });
@@ -50,7 +46,7 @@ app.factory("NumberCard", function(Card, $q){
                 return $q.reject("Select one position in the board");
             }
 
-            if(!ctrl.board.rows[selected_position.row][selected_position.column].isEmpty()){
+            if(ctrl.board.rows[selected_position.row][selected_position.column].type != "empty"){
                 return $q.reject("Select an empty position in the board");
             }
 
@@ -62,10 +58,10 @@ app.factory("NumberCard", function(Card, $q){
             }
 
             if(!empty && (
-                    (selected_position.row <= 0 || ctrl.board.rows[selected_position.row - 1][selected_position.column].isEmpty()) &&
-                    (selected_position.column + 1 >= ctrl.board.rows[selected_position.row].length || ctrl.board.rows[selected_position.row][selected_position.column + 1].isEmpty()) &&
-                    (selected_position.row + 1 >= ctrl.board.rows.length || ctrl.board.rows[selected_position.row + 1][selected_position.column].isEmpty()) &&
-                    (selected_position.column <= 0 || ctrl.board.rows[selected_position.row][selected_position.column - 1].isEmpty())
+                    (selected_position.row <= 0 || ctrl.board.rows[selected_position.row - 1][selected_position.column] == "empty") &&
+                    (selected_position.column + 1 >= ctrl.board.rows[selected_position.row].length || ctrl.board.rows[selected_position.row][selected_position.column + 1] == "empty") &&
+                    (selected_position.row + 1 >= ctrl.board.rows.length || ctrl.board.rows[selected_position.row + 1][selected_position.column] == "empty") &&
+                    (selected_position.column <= 0 || ctrl.board.rows[selected_position.row][selected_position.column - 1] == "empty")
                 )){
                 return $q.reject("Select one position next to a card in the board");
             }

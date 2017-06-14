@@ -128,7 +128,7 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
     
     self.startGame = function(order){
         if(self.host){
-            var order = _.shuffle(_.map(self.players, "id"));
+            order = _.shuffle(_.map(self.players, "id"));
             self.togetherjs.send({type: "start-game", order: order});
         }
         
@@ -195,12 +195,10 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         var hit_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
-                if(self.board.rows[i][j].type == "number" && !self.board.rows[i][j].isEmpty()){
+                if(self.board.rows[i][j].type == "number"){
                     _.forEach(_.filter(self.dice, "active"), function(die){
                         if(self.board.rows[i][j].numbers[die.color] && die.number == self.board.rows[i][j].numbers[die.color]){
                             self.board.rows[i][j].hit = true;
-                            console.log("HIT", self.board.rows[i][j])
-                            hit_cards.push({row: i, column: j});
                             return false;
                         }
                     });
@@ -211,22 +209,30 @@ app.controller("GameController", function($scope, $q, Config, Utils, TogetherJS,
         return $q.resolve({text: "Comprobar resultados", fn: self.checkHits, args: hit_cards});
     };
     
-    self.checkHits = function(hit_cards){
-        if(!hit_cards.length){
-            return self.endTurn();
-        }
-        
-        //Get player cards coords
+    self.checkHits = function(){
+        //Get player cards and hit cards coords
         var player_cards = [];
+        var hit_cards = [];
         for(var i = 0, len = self.board.rows.length; i < len; i++){
             for(var j = 0, len2 = self.board.rows[i].length; j < len2; j++){
                 if(self.board.rows[i][j].type == "player" && self.board.rows[i][j].player == self.active_player){
                     player_cards.push({row: i, column: j});
                 }
+                else if(self.board.rows[i][j].type == "number"){
+                    _.forEach(_.filter(self.dice, "active"), function(die){
+                        if(self.board.rows[i][j].numbers[die.color] && die.number == self.board.rows[i][j].numbers[die.color]){
+                            hit_cards.push({row: i, column: j});
+                            return false;
+                        }
+                    });
+                }
             } 
         }
         
-        if(hit_cards.length <= self.active_player.player_cards.length){
+        if(!hit_cards.length){
+            return self.endTurn();
+        }
+        else if(hit_cards.length <= self.active_player.player_cards.length){
             for(var i = 0, len = hit_cards.length; i < len; i++){
                 self.board.rows[hit_cards[i].row][hit_cards[i].column] = self.active_player.player_cards.pop();
             }

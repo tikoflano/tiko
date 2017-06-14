@@ -21,7 +21,7 @@ app.factory("Board", ["EmptyCard", function(EmptyCard){
     Board.prototype.isEmpty = function(){
         for(var i = 0, len = this.rows.length; i < len; i++){
             for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
-                if(!this.rows[i][j].isEmpty()){
+                if(this.rows[i][j].type != "empty"){
                     return false;
                 }
             } 
@@ -33,7 +33,7 @@ app.factory("Board", ["EmptyCard", function(EmptyCard){
     Board.prototype.isFull = function(){
         for(var i = 0, len = this.rows.length; i < len; i++){
             for(var j = 0, len2 = this.rows[i].length; j < len2; j++){
-                if(this.rows[i][j].isEmpty()){
+                if(this.rows[i][j].type == "empty"){
                     return false;
                 }
             } 
