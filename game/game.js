@@ -1,3 +1,4 @@
+#Comentario de prueba
 var app = angular.module("game", []);
 app.constant("Config", {
     debug: false,
